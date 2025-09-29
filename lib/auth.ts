@@ -13,7 +13,7 @@ export const authOptions: NextAuthOptions = {
         userId: { label: "User ID", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials): Promise<any> {
+      async authorize(credentials) {
         if (!credentials?.userId || !credentials?.password) return null;
 
         const student = await prisma.student.findUnique({
@@ -26,7 +26,7 @@ export const authOptions: NextAuthOptions = {
         if (!isValid) return null;
 
         return {
-          id: student.id.toString(), // ✅ cast number → string
+          id: student.id.toString(), // 🔥 FIX
           userId: student.userId,
           mustChangePassword: student.mustChangePassword,
         };
