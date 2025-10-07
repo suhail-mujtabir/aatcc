@@ -39,3 +39,21 @@ body {
 .animate-stroke-draw {
   animation: stroke-draw 2s linear forwards;
 }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.hero-with-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0; /* This is equivalent to top: 0; right: 0; bottom: 0; left: 0; */
+  background-color: rgba(0, 0, 0, 0.6); /* This creates the black overlay with 50% opacity */
+  z-index: 0; /* Puts the overlay on the bottom of the stacking context */
+}
+
+/* Ensure the hero background image itself is set up correctly */
+.hero-with-overlay {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

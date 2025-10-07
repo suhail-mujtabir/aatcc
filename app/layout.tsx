@@ -2,6 +2,9 @@ import "./globals.css";
 import type { Metadata } from "next";
 import Navbar from "../components/Navbar";
 import SessionProviderWrapper from "./SessionProviderWrapper";
+import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
+
 
 export const metadata: Metadata = {
   title: "Student Org Website",
@@ -15,6 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        
+      </head>
       <body>
         <Navbar />
         <main className="flex-grow">
@@ -22,6 +28,8 @@ export default function RootLayout({
             {children}
           </SessionProviderWrapper>
         </main>
+        <Footer/>
+        <ScrollToTop />
       </body>
     </html>
   );

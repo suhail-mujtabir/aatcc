@@ -1,11 +1,14 @@
 // app/about/page.tsx
 
 // --- Content (easy to edit) ---
+"use client";
+
+
 const hero = {
     title: "About Us",
     subtitle:
       "Learn more about our journey, vision, and the people behind our student organization.",
-    image: "/about-hero.jpg", // Replace with your own image
+    image: "/hero-textile.jpg", // Replace with your own image
   };
   
   const aboutIntro = {
@@ -56,6 +59,7 @@ const hero = {
   // --- Page Component ---
   export default function AboutPage() {
     return (
+      
       <div className="flex flex-col">
         {/* Hero Section */}
         <section className="relative h-[60vh] flex items-center justify-center text-center text-white">

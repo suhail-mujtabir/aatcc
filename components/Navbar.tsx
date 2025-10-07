@@ -1,9 +1,10 @@
-// components/Navbar.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 
 const NAV_ITEMS = [
   { id: "about", label: "About", page: "/about" },
@@ -89,17 +90,25 @@ export default function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={`fixed top-0 left-0 w-full z-50 transition-colors duration-500 ${
-        scrolled ? "bg-black/85 backdrop-blur-md" : "bg-transperent"
+        scrolled ? "bg-black/85 backdrop-blur-md" : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-white">
-        <a
-          href="/"
-          className="text-2xl font-bold hover:text-green-400 transition-colors duration-500"
-        >
-          Student Org
-        </a>
+      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between text-white">
+        {/* ✅ LOGO + TITLE */}
+        <Link href="/" className="flex items-center space-x-3 group">
+          <Image
+            src="/logo.png"
+            alt="AATCC Logo"
+            width={45}
+            height={45}
+            className="rounded-md transition-transform duration-300 group-hover:scale-105"
+          />
+          <span className="text-xl font-bold tracking-wide hover:text-green-400 transition-colors duration-500">
+            AATCC Student Chapter
+          </span>
+        </Link>
 
+        {/* ✅ NAVIGATION LINKS */}
         <ul className="flex items-center space-x-8">
           {NAV_ITEMS.map((it) => (
             <li key={it.id} className="relative">
@@ -119,7 +128,7 @@ export default function Navbar() {
                   />
                 </a>
 
-                {/* Dropdown only for Overview */}
+                {/* Dropdown for Overview */}
                 {it.children && (
                   <ul className="absolute left-0 mt-2 w-48 bg-black/90 rounded-lg shadow-lg opacity-0 invisible group-hover:visible group-hover:opacity-100 transform scale-95 group-hover:scale-100 transition-all duration-300 origin-top">
                     {it.children.map((child) => (
