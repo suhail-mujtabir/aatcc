@@ -30,10 +30,12 @@ export default function LoginPage() {
   const router = useRouter();
   const { user } = useAuth();
   const supabase = createClient();
-  const vantaRef = useRef(null); // Ref for the Vanta.js background
+  const vantaRef = useRef(null); 
 
-  // --- Redirect if already logged in ---
+  // --- This useEffect now solely handles the redirect ---
   useEffect(() => {
+    // If the user object exists, it means they are logged in.
+    // Redirect them to the dashboard.
     if (user) {
       router.push("/dashboard");
     }
@@ -110,16 +112,15 @@ export default function LoginPage() {
   };
 
   // --- Render Logic ---
-  if (user) {
-    return <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">Loading...</div>;
-  }
+  // ▼▼▼ WE REMOVED THE if (user) { ... } BLOCK FROM HERE ▼▼▼
   
   return (
-    // ▼▼▼ THIS IS THE CORRECTED LINE ▼▼▼
     <div className=" text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex items-center justify-center">
       <div ref={vantaRef} id="vanta-bg"></div>
       
       <div className="relative w-full max-w-md px-4 sm:px-6 py-6 sm:py-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-xl shadow-2xl overflow-hidden mx-4 sm:mx-0">
+        {/* The rest of your JSX is exactly the same... */}
+        
         {/* Theme Toggle */}
         <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex items-center">
           <div className="relative inline-block w-14 mr-2 align-middle select-none">
