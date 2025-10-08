@@ -5,34 +5,62 @@ import { createContext, useState, useEffect, useContext, ReactNode } from 'react
 import { createClient } from '@/lib/supabase/client';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 
-// Define the context shape
+// Define the shape of a user profile
+type Profile = {
+  full_name: string;
+  student_id: string;
+};
+
+// Update the context shape to include the profile
 type AuthContextType = {
   user: User | null;
+  profile: Profile | null; // <-- ADD THIS
   signOut: () => Promise<void>;
   supabase: SupabaseClient;
 };
 
-// Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Create the provider component
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null); // <-- ADD THIS
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getSession = async () => {
+    const getSessionAndProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
+
+      // If there's a user, fetch their profile
+      if (session?.user) {
+        const { data: userProfile } = await supabase
+          .from('Profiles') // Use your case-sensitive table name
+          .select('full_name, student_id')
+          .eq('id', session.user.id)
+          .single(); // .single() fetches one record
+        setProfile(userProfile);
+      }
+      
       setLoading(false);
     };
 
-    getSession();
+    getSessionAndProfile();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         setUser(session?.user ?? null);
+        // Also fetch the profile on auth changes
+        if (session?.user) {
+          const { data: userProfile } = await supabase
+            .from('Profiles')
+            .select('full_name, student_id')
+            .eq('id', session.user.id)
+            .single();
+          setProfile(userProfile);
+        } else {
+          setProfile(null); // Clear profile on logout
+        }
         setLoading(false);
       }
     );
@@ -40,10 +68,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, [supabase.auth]);
+  }, [supabase, supabase.auth]);
 
   const value = {
     user,
+    profile, // <-- ADD THIS
     signOut: async () => {
       await supabase.auth.signOut();
     },
@@ -57,7 +86,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Create a custom hook to use the auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
