@@ -23,7 +23,7 @@ const hero = {
     a Chair, Vice Chair, Secretary, Treasurer and supported by a Faculty Advisor,
     the chapter is committed to both professional development and academic
     engagement.`,
-    image: "/fuad pic.jpeg", // Replace with your own image
+    image: "/founding.jpg", // Replace with your own image
   };
   
   const journey = {

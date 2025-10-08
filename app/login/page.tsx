@@ -54,7 +54,7 @@ export default function LoginPage() {
       setIsDark(false);
     }
 
-    // Vanta.js background initialization
+    //Vanta.js background initialization
     const vantaEffect = window.VANTA && window.VANTA.WAVES({
         el: vantaRef.current,
         mouseControls: true,
@@ -71,7 +71,7 @@ export default function LoginPage() {
         zoom: 0.80
     });
     
-    // Cleanup function to destroy Vanta effect on component unmount
+   // Cleanup function to destroy Vanta effect on component unmount
     return () => {
       if (vantaEffect) vantaEffect.destroy();
     };
@@ -206,7 +206,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full flex justify-center py-2 sm:py-3 px-3 sm:px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300 disabled:bg-blue-400 disabled:cursor-not-allowed"
+              className="cursor-pointer btn-primary w-full flex justify-center py-2 sm:py-3 px-3 sm:px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300 disabled:bg-blue-400 disabled:cursor-not-allowed"
             >
               <span id="btn-text">{loading ? 'Authenticating...' : 'Sign in'}</span>
               {loading && (

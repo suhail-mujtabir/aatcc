@@ -1,7 +1,6 @@
-// context/AuthContext.tsx
 'use client';
 
-import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
+import { createContext, useState, useEffect, useContext, ReactNode, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 
@@ -11,11 +10,11 @@ type Profile = {
   student_id: string;
 };
 
-// Update the context shape to include the profile
+// The context shape remains the same
 type AuthContextType = {
   user: User | null;
-  profile: Profile | null; // <-- ADD THIS
-  signOut: () => Promise<void>;
+  profile: Profile | null;
+  loading: boolean;
   supabase: SupabaseClient;
 };
 
@@ -24,64 +23,59 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null); // <-- ADD THIS
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Use useCallback to memoize the data fetching function.
+  // This is a React best practice that ensures the function identity is stable.
+  const fetchUserAndProfile = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const currentUser = session?.user;
+    
+    setUser(currentUser ?? null);
+
+    if (currentUser) {
+      const { data: userProfile } = await supabase
+        .from('Profiles')
+        .select('full_name, student_id')
+        .eq('id', currentUser.id)
+        .single();
+      setProfile(userProfile ?? null);
+    } else {
+      setProfile(null);
+    }
+    
+    setLoading(false);
+  }, [supabase]);
+
+  // This single useEffect handles both the initial load and any auth changes.
   useEffect(() => {
-    const getSessionAndProfile = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    // Fetch the user on initial component mount
+    fetchUserAndProfile();
+
+    // Set up a listener for any changes in auth state (login/logout)
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      // When auth state changes, re-fetch the profile as well
+      fetchUserAndProfile(); 
+    });
 
-      // If there's a user, fetch their profile
-      if (session?.user) {
-        const { data: userProfile } = await supabase
-          .from('Profiles') // Use your case-sensitive table name
-          .select('full_name, student_id')
-          .eq('id', session.user.id)
-          .single(); // .single() fetches one record
-        setProfile(userProfile);
-      }
-      
-      setLoading(false);
-    };
-
-    getSessionAndProfile();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setUser(session?.user ?? null);
-        // Also fetch the profile on auth changes
-        if (session?.user) {
-          const { data: userProfile } = await supabase
-            .from('Profiles')
-            .select('full_name, student_id')
-            .eq('id', session.user.id)
-            .single();
-          setProfile(userProfile);
-        } else {
-          setProfile(null); // Clear profile on logout
-        }
-        setLoading(false);
-      }
-    );
-
+    // Cleanup the listener when the component unmounts
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, [supabase, supabase.auth]);
+  }, [fetchUserAndProfile, supabase.auth]);
 
   const value = {
     user,
-    profile, // <-- ADD THIS
-    signOut: async () => {
-      await supabase.auth.signOut();
-    },
+    profile,
+    loading,
     supabase,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };
@@ -93,3 +87,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

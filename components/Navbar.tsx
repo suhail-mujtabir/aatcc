@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 const NAV_ITEMS = [
   { id: "about", label: "About", page: "/about" },
@@ -23,19 +24,15 @@ const NAV_ITEMS = [
   { id: "contact", label: "Contact", page: "/contact" },
 ];
 
-// Smooth scroll helpers
-const SCROLL_DURATION = 1000;
-const NAVBAR_OFFSET = 80;
-
+// --- Smooth scroll helper functions (unchanged) ---
 function easeInOutCubic(t: number) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
-function smoothScrollTo(targetY: number, duration = SCROLL_DURATION) {
+async function smoothScrollTo(targetY: number, duration = 1000) {
   const startY = window.scrollY || window.pageYOffset;
   const diff = targetY - startY;
   let startTime: number | null = null;
-
   return new Promise<void>((resolve) => {
     function step(timestamp: number) {
       if (startTime === null) startTime = timestamp;
@@ -52,49 +49,59 @@ function smoothScrollTo(targetY: number, duration = SCROLL_DURATION) {
     requestAnimationFrame(step);
   });
 }
+// --- End of smooth scroll helpers ---
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const { user, loading } = useAuth();
+
+  // --- Determine current page for styling ---
   const isHome = pathname === "/";
+  const isDashboard = pathname.startsWith("/dashboard");
+  const isLoginPage = pathname === "/login";
 
+  // Effect to handle scroll behavior on the homepage
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const handleClick = async (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    id: string
-  ) => {
-    if (!isHome) return; // if not on home, let normal link work
-
-    if (e.metaKey || e.ctrlKey || e.button === 1) return;
+    if (isHome) {
+      const handleScroll = () => setScrolled(window.scrollY > 50);
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+  }, [isHome]);
+  
+  const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    if (!isHome) return;
     e.preventDefault();
-
     const el = document.getElementById(id);
     if (el) {
       const rect = el.getBoundingClientRect();
-      const targetY = window.scrollY + rect.top - NAVBAR_OFFSET;
-      await smoothScrollTo(targetY, SCROLL_DURATION);
+      const targetY = window.scrollY + rect.top - 80; // Navbar offset
+      await smoothScrollTo(targetY);
       history.replaceState(null, "", `#${id}`);
     } else {
       window.location.href = `/#${id}`;
     }
   };
 
+  // --- Hide Navbar on the login page ---
+  if (isLoginPage) {
+    return null;
+  }
+
   return (
     <motion.nav
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className={`fixed top-0 left-0 w-full z-50 transition-colors duration-500 ${
-        scrolled ? "bg-black/85 backdrop-blur-md" : "bg-transparent"
-      }`}
+      className={`
+        ${isDashboard ? 'sticky' : 'fixed'} 
+        top-0 left-0 w-full z-50 transition-colors duration-500 
+        ${(scrolled && isHome) || !isHome ? "bg-black/85 backdrop-blur-md" : "bg-transparent"}
+      `}
     >
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between text-white">
-        {/* ✅ LOGO + TITLE */}
+        {/* LOGO + TITLE */}
         <Link href="/" className="flex items-center space-x-3 group">
           <Image
             src="/logo.png"
@@ -108,8 +115,8 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* ✅ NAVIGATION LINKS */}
-        <ul className="flex items-center space-x-8">
+        {/* NAVIGATION LINKS */}
+        <ul className="hidden md:flex items-center space-x-8">
           {NAV_ITEMS.map((it) => (
             <li key={it.id} className="relative">
               <div className="group inline-block">
@@ -128,7 +135,7 @@ export default function Navbar() {
                   />
                 </a>
 
-                {/* Dropdown for Overview */}
+                {/* Dropdown for Activities */}
                 {it.children && (
                   <ul className="absolute left-0 mt-2 w-48 bg-black/90 rounded-lg shadow-lg opacity-0 invisible group-hover:visible group-hover:opacity-100 transform scale-95 group-hover:scale-100 transition-all duration-300 origin-top">
                     {it.children.map((child) => (
@@ -147,7 +154,29 @@ export default function Navbar() {
             </li>
           ))}
         </ul>
+
+        {/* --- CONDITIONAL LOGIN/DASHBOARD LINK --- */}
+        <div className="pl-4">
+          {loading ? (
+            <div className="h-9 w-24 bg-gray-700/50 rounded-lg animate-pulse"></div>
+          ) : user ? (
+            <Link
+              href="/dashboard"
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105"
+            >
+              Login
+            </Link>
+          )}
+        </div>
       </div>
     </motion.nav>
   );
 }
+
