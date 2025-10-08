@@ -1,9 +1,10 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import Navbar from "../components/Navbar";
-import SessionProviderWrapper from "./SessionProviderWrapper";
+import { AuthProvider } from "@/context/AuthContext";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
+import Script from 'next/script'
 
 
 export const metadata: Metadata = {
@@ -19,14 +20,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        
+        {/* Vanta.js requires three.js as a dependency, so we load it first */}
+        <Script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" strategy="beforeInteractive" />
+        <Script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js" strategy="beforeInteractive" />
       </head>
       <body>
         <Navbar />
         <main className="flex-grow">
-          <SessionProviderWrapper>
+        <AuthProvider>
             {children}
-          </SessionProviderWrapper>
+            </AuthProvider>
         </main>
         <Footer/>
         <ScrollToTop />
