@@ -42,6 +42,7 @@ export default function DashboardPage() {
         <button
           onClick={async () => {
             await signOut();
+            router.refresh();
             router.push('/login'); // Redirect to login after signing out
           }}
           className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition"
