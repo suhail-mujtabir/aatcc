@@ -64,12 +64,19 @@ export default function Navbar() {
   // Effect to handle scroll behavior on the homepage
   useEffect(() => {
     if (isHome) {
-      const handleScroll = () => setScrolled(window.scrollY > 50);
+      const handleScroll = () => {
+        setScrolled(window.scrollY > 50);
+      };
+      // Run once on load to set the initial state correctly
+      handleScroll(); 
       window.addEventListener("scroll", handleScroll, { passive: true });
       return () => window.removeEventListener("scroll", handleScroll);
+    } else {
+      // On any other page, the navbar background is always solid
+      setScrolled(true);
     }
-  }, [isHome]);
-  
+  }, [isHome]); // This effect re-runs whenever the page changes
+
   const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     if (!isHome) return;
     e.preventDefault();
@@ -97,7 +104,7 @@ export default function Navbar() {
       className={`
         ${isDashboard ? 'sticky' : 'fixed'} 
         top-0 left-0 w-full z-50 transition-colors duration-500 
-        ${(scrolled && isHome) || !isHome ? "bg-black/85 backdrop-blur-md" : "bg-transparent"}
+        ${!isHome || scrolled ? "bg-black/85 backdrop-blur-md" : "bg-transparent"}
       `}
     >
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between text-white">

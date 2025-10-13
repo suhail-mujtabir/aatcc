@@ -1,8 +1,5 @@
 // app/about/page.tsx
 
-// --- Content (easy to edit) ---
-"use client";
-
 
 const hero = {
     title: "About Us",
