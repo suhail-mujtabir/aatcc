@@ -1,4 +1,4 @@
-"use client";
+
 
 const newsContent = {
   title: "News & Announcements",

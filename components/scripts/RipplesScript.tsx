@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
-import Script from "next/script";
+import Script from 'next/script';
+import type { JQuery } from 'jquery';
 
-// We need to declare jQuery for TypeScript to recognize the '$' symbol
+// We need to declare jQuery for TypeScript to recognize the ' symbol
 declare global {
   interface Window {
-    $: any;
+    $: JQuery;
   }
 }
 
@@ -21,15 +22,17 @@ export default function RipplesScript() {
         src="https://cdnjs.cloudflare.com/ajax/libs/jquery.ripples/0.5.3/jquery.ripples.min.js"
         strategy="afterInteractive"
         onReady={() => {
-          try {
-            // @ts-ignore
-            $(".water").ripples({
-              resolution: 512,
-              dropRadius: 25,
-              perturbance: 0.03,
-            });
-          } catch (e) {
-            console.error("Failed to initialize ripples", e);
+          const $ = window.$;
+          if ($) {
+            try {//@ts-ignore
+              $(".water").ripples({
+                resolution: 512,
+                dropRadius: 25,
+                perturbance: 0.03,
+              });
+            } catch (e) {
+              console.error("Failed to initialize ripples. This is expected on browsers that don't support WebGL.", e);
+            }
           }
         }}
       />

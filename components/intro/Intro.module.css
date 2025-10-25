@@ -1,0 +1,188 @@
+/* components/Intro/Intro.module.css */
+.intro {
+  position: fixed;
+  z-index: 99999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #000000;
+  transition: 1.5s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.intro.hidden {
+  top: -100vh;
+}
+
+.logoHeader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: left;
+  transition: all 0.5s ease-in-out;
+}
+
+/* When reveal is complete, change to block layout with left alignment */
+.logoHeader.revealComplete {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.logoHeader.revealComplete .secondPart {
+  width: auto !important;
+  display: block;
+  margin-left: 0 !important;
+}
+
+.logo {
+  position: relative;
+  display: inline-block;
+  bottom: -20px;
+  opacity: 0;
+  transition: ease-in-out 0.5s;
+  white-space: nowrap;
+}
+
+.logo.active {
+  bottom: 0;
+  opacity: 1;
+}
+
+.anime {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-weight: bold;
+  font-size: 2rem;
+}
+
+/* First Part - "AATCC" - Blue color with fade animation */
+.firstPart {
+  color: #004466;
+  animation: showup 7s infinite;
+}
+
+/* Second Part - "AUST Student Chapter" - Green color with typewriter reveal animation */
+.secondPart {
+  color: #008844;
+  width: 0px;
+  animation: reveal 7s infinite;
+}
+
+.slideInText {
+  animation: slidein 7s infinite;
+}
+
+/* Keyframes for the animations */
+@keyframes showup {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes slidein {
+  0% {
+    margin-left: -800px;
+  }
+  20% {
+    margin-left: -800px;
+  }
+  35% {
+    margin-left: 0px;
+  }
+  100% {
+    margin-left: 0px;
+  }
+}
+
+@keyframes reveal {
+  0% {
+    opacity: 0;
+    width: 0px;
+  }
+  20% {
+    opacity: 1;
+    width: 0px;
+  }
+  30% {
+    width: 420px; /* Width for " AUST Student Chapter" */
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    width: 420px;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .anime {
+    font-size: 2rem;
+  }
+  
+  @keyframes reveal {
+    0% {
+      opacity: 0;
+      width: 0px;
+    }
+    20% {
+      opacity: 1;
+      width: 0px;
+    }
+    30% {
+      width: 280px;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      width: 280px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .anime {
+    font-size: 1.5rem;
+  }
+  
+  @keyframes reveal {
+    0% {
+      opacity: 0;
+      width: 0px;
+    }
+    20% {
+      opacity: 1;
+      width: 0px;
+    }
+    30% {
+      width: 220px;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      width: 220px;
+    }
+  }
+}
