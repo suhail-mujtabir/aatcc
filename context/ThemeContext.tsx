@@ -12,18 +12,19 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [isDark, setIsDark] = useState(false);
 
-  // This useEffect runs ONLY on the client, AFTER the initial render has completed safely.
   useEffect(() => {
+    // ONLY check localStorage, ignore system preference
     const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+    if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
       setIsDark(true);
     } else {
+      // Default to light theme, ignore system preference
       document.documentElement.classList.remove('dark');
       setIsDark(false);
+      localStorage.setItem('theme', 'light'); // Set default to light
     }
-  }, []); // The empty dependency array ensures this runs only once on mount.
+  }, []);
 
   const toggleTheme = () => {
     const newIsDark = !isDark;

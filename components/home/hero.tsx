@@ -12,7 +12,6 @@ export default function Hero({ handleScrollClick }: HeroProps) {
     <div
   className="relative h-screen flex items-center justify-center text-center text-white water hero-with-overlay"
   style={{ backgroundImage: "url(/hero-textile.jpg)" }}
-  id="hero-section"
 >
       <div className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
         <motion.h1
