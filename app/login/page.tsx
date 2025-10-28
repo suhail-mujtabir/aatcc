@@ -1,15 +1,12 @@
 // app/login/page.tsx
 "use client";
 
-import { useState, useEffect, useRef, FormEvent } from "react";
+import { useState, useEffect, useRef, FormEvent, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
-
-// It's better to use a React-specific icon library
 import { Lock, Eye, EyeOff, Moon } from "react-feather";
 
-// Since VANTA and feather are loaded via scripts, we need to declare them to avoid TypeScript errors
 declare global {
   interface Window {
     VANTA: any;
@@ -17,8 +14,8 @@ declare global {
   }
 }
 
-export default function LoginPage() {
-  // --- State Management ---
+// Create a separate component that uses useSearchParams
+function LoginForm() {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -27,28 +24,21 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isDark, setIsDark] = useState(false);
   
-  // --- Hooks ---
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
   const supabase = createClient();
   const vantaRef = useRef(null); 
 
-  // Get redirect parameter from URL
   const redirectTo = searchParams.get('redirect') || '/dashboard';
 
-  // --- This useEffect now solely handles the redirect ---
   useEffect(() => {
-    // If the user object exists, it means they are logged in.
-    // Redirect them to the intended page or dashboard.
     if (user) {
       router.push(redirectTo);
     }
   }, [user, router, redirectTo]);
 
-  // --- Effect for Initializing Third-Party Libraries ---
   useEffect(() => {
-    // Theme initialization from localStorage
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
@@ -59,7 +49,6 @@ export default function LoginPage() {
       setIsDark(false);
     }
 
-    //Vanta.js background initialization
     const vantaEffect = window.VANTA && window.VANTA.WAVES({
         el: vantaRef.current,
         mouseControls: true,
@@ -76,13 +65,11 @@ export default function LoginPage() {
         zoom: 0.80
     });
     
-   // Cleanup function to destroy Vanta effect on component unmount
     return () => {
       if (vantaEffect) vantaEffect.destroy();
     };
   }, []);
 
-  // --- Event Handlers ---
   const handleThemeToggle = () => {
     if (isDark) {
       document.documentElement.classList.remove('dark');
@@ -112,13 +99,10 @@ export default function LoginPage() {
       return;
     }
 
-    // Redirect to the intended page or dashboard
     router.push(redirectTo);
     router.refresh();
   };
 
-  // --- Render Logic ---
-  
   return (
     <div className=" text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex items-center justify-center">
       <div ref={vantaRef} id="vanta-bg"></div>
@@ -222,5 +206,18 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-blue-600"></div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
