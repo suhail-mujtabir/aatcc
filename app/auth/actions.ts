@@ -6,10 +6,10 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
 export async function signOut() {
-  const supabase = createClient()
+  const supabase = await createClient()
   await supabase.auth.signOut()
 
-  // These ensure the user is fully logged out and redirected.
+  // Force complete refresh to clear all client state including AuthContext
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/?timestamp=' + Date.now()) // Add timestamp to bypass cache
 }

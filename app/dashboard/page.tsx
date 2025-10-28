@@ -1,16 +1,19 @@
+// app/dashboard/page.tsx
 'use client';
 
 import { useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { signOut } from '@/app/auth/actions';
-import { Calendar, Bell, User, Book, LogOut } from 'react-feather'; // Using react-feather for icons
+import { Calendar, Bell, User, Book, LogOut, Key } from 'react-feather'; // Added Key icon
+import { clientSignOut } from '@/app/auth/client-actions';
+
 
 export default function DashboardPage() {
   // Get all necessary data from the hook
   const { user, profile, loading } = useAuth();
   const router = useRouter();
-
+  const handleSignOut = clientSignOut()
   // This effect handles redirecting if the user logs out or isn't logged in
   useEffect(() => {
     // Only check for redirection after the initial loading is done
@@ -45,18 +48,27 @@ export default function DashboardPage() {
               Welcome, {profile.full_name}!
             </h1>
             <p className="mt-1 text-md text-gray-500 dark:text-gray-400">
-  Student ID: {profile.student_id.split('@')[0]}
+              Student ID: {profile.student_id.split('@')[0]}
             </p>
           </div>
-          <form action={signOut} className="mt-4 sm:mt-0">
+          <div className="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-0">
             <button
-              type="submit"
-              className="cursor-pointer flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105"
+              onClick={() => router.push('/change-password')}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105"
             >
-              <LogOut size={18} />
-              <span>Logout</span>
+              <Key size={18} />
+              <span>Change Password</span>
             </button>
-          </form>
+            <form action={signOut}>
+              <button
+  onClick={handleSignOut}
+  className="cursor-pointer flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105"
+>
+                <LogOut size={18} />
+                <span>Logout</span>
+              </button>
+            </form>
+          </div>
         </header>
 
         {/* Dashboard Cards Grid */}
@@ -127,4 +139,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
