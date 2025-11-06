@@ -1,6 +1,7 @@
+// context/AuthContext.tsx
 'use client';
 
-import { createContext, useState, useEffect, useContext, ReactNode, useCallback } from 'react';
+import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 
@@ -26,45 +27,98 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Use useCallback to memoize the data fetching function.
-  // This is a React best practice that ensures the function identity is stable.
-  const fetchUserAndProfile = useCallback(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    const currentUser = session?.user;
-    
-    setUser(currentUser ?? null);
-
-    if (currentUser) {
-      const { data: userProfile } = await supabase
-        .from('Profiles')
-        .select('full_name, student_id')
-        .eq('id', currentUser.id)
-        .single();
-      setProfile(userProfile ?? null);
-    } else {
-      setProfile(null);
-    }
-    
-    setLoading(false);
-  }, [supabase]);
-
-  // This single useEffect handles both the initial load and any auth changes.
   useEffect(() => {
-    // Fetch the user on initial component mount
-    fetchUserAndProfile();
+    let mounted = true;
 
-    // Set up a listener for any changes in auth state (login/logout)
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      // When auth state changes, re-fetch the profile as well
-      fetchUserAndProfile(); 
-    });
+    const initializeAuth = async () => {
+      try {
+        console.log('🔄 AuthContext: Initializing auth...');
+        // Get initial session
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!mounted) return;
 
-    // Cleanup the listener when the component unmounts
-    return () => {
-      authListener?.subscription.unsubscribe();
+        console.log('🔄 AuthContext: Session found?', !!session?.user);
+        
+        if (session?.user) {
+          setUser(session.user);
+          console.log('🔄 AuthContext: User set, fetching profile...');
+          // Fetch profile
+          const { data: userProfile, error } = await supabase
+            .from('Profiles')
+            .select('full_name, student_id')
+            .eq('id', session.user.id)
+            .single();
+            
+          if (error) {
+            console.error('🔄 AuthContext: Profile fetch error:', error);
+          } else {
+            console.log('🔄 AuthContext: Profile fetched:', userProfile);
+          }
+          
+          setProfile(userProfile ?? null);
+        } else {
+          setUser(null);
+          setProfile(null);
+          console.log('🔄 AuthContext: No session, user cleared');
+        }
+      } catch (error) {
+        console.error('🔄 AuthContext: Initialization error:', error);
+        if (mounted) {
+          setUser(null);
+          setProfile(null);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+          console.log('🔄 AuthContext: Loading complete');
+        }
+      }
     };
-  }, [fetchUserAndProfile, supabase.auth]);
+
+    initializeAuth();
+
+    // Auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!mounted) return;
+
+        console.log('🔄 AuthContext: Auth state changed:', event, session?.user?.id);
+        
+        if (session?.user) {
+          setUser(session.user);
+          console.log('🔄 AuthContext: User updated from auth change');
+          // Fetch profile on sign in
+          if (event === 'SIGNED_IN') {
+            const { data: userProfile, error } = await supabase
+              .from('Profiles')
+              .select('full_name, student_id')
+              .eq('id', session.user.id)
+              .single();
+              
+            if (error) {
+              console.error('🔄 AuthContext: Profile fetch error on SIGNED_IN:', error);
+            } else {
+              console.log('🔄 AuthContext: Profile updated on SIGNED_IN:', userProfile);
+            }
+            
+            setProfile(userProfile ?? null);
+          }
+        } else {
+          setUser(null);
+          setProfile(null);
+          console.log('🔄 AuthContext: User cleared from auth change');
+        }
+        
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
 
   const value = {
     user,
@@ -87,4 +141,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

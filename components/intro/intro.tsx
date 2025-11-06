@@ -1,3 +1,4 @@
+// components/Intro/Intro.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -11,34 +12,36 @@ export default function Intro({ onAnimationComplete }: IntroProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [shouldRender, setShouldRender] = useState(true);
   const [isActive, setIsActive] = useState(false);
-  const [isRevealComplete, setIsRevealComplete] = useState(false);
+  const [isLogoActive, setIsLogoActive] = useState(false);
 
   useEffect(() => {
-    // Activate the logo after a short delay
+    // Activate logo first with rotate down animation
+    const logoTimer = setTimeout(() => {
+      setIsLogoActive(true);
+    }, 200);
+
+    // Then activate the text after logo animation
     const activateTimer = setTimeout(() => {
       setIsActive(true);
-    }, 100);
-
-    // Set reveal complete 500ms before reveal animation finishes (around 2s instead of 2.5s)
-    const revealCompleteTimer = setTimeout(() => {
-      setIsRevealComplete(true);
-    }, 1700);
+    }, 1000);
 
     // Slide up and remove after 3.5 seconds total
     const slideUpTimer = setTimeout(() => {
       setIsVisible(false);
       
+      // Remove from DOM after transition completes
       const removeTimer = setTimeout(() => {
         setShouldRender(false);
         onAnimationComplete?.();
-      }, 1500);
+      }, 1500); // Match CSS transition duration
       
       return () => clearTimeout(removeTimer);
-    }, 3500);
+    }, 3000); // Total animation duration
 
+    // Cleanup timers
     return () => {
+      clearTimeout(logoTimer);
       clearTimeout(activateTimer);
-      clearTimeout(revealCompleteTimer);
       clearTimeout(slideUpTimer);
     };
   }, [onAnimationComplete]);
@@ -47,21 +50,31 @@ export default function Intro({ onAnimationComplete }: IntroProps) {
 
   return (
     <div className={`${styles.intro} ${!isVisible ? styles.hidden : ''}`}>
-      <div className={`${styles.logoHeader} ${isRevealComplete ? styles.revealComplete : ''}`}>
-        <div className={`${styles.logo} ${isActive ? styles.active : ''}`}>
+      <div className={styles.logoHeader}>
+        {/* Logo with rotate down animation */}
+        <div className={`${styles.logoContainer} ${isLogoActive ? styles.logoActive : ''}`}>
+          <img 
+            src="/aatcc.svg" 
+            alt="Logo" 
+            className={styles.logoImage}
+          />
+        </div>
+        
+        {/* Combined text container */}
+        {/* <div className={`${styles.logo} ${isActive ? styles.active : ''}`}> */}
           {/* First Part - "AATCC" with fade animation */}
-          <span className={`${styles.anime} ${styles.firstPart}`}>
+          {/* <span className={`${styles.anime} ${styles.firstPart}`}>
             AATCC
-          </span>
+          </span> */}
           
           {/* Second Part - "AUST Student Chapter" with typewriter and slide-in effects */}
           <span className={`${styles.anime} ${styles.secondPart}`}>
             <span className={styles.slideInText}>
-              AUST Student Chapter
+              &nbsp;AUST Student Chapter
             </span>
           </span>
         </div>
       </div>
-    </div>
+    // </div>
   );
 }

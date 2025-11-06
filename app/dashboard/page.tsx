@@ -1,26 +1,37 @@
 // app/dashboard/page.tsx
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { signOut } from '@/app/auth/actions';
-import { Calendar, Bell, User, Book, LogOut, Key } from 'react-feather'; // Added Key icon
+import { Calendar, Bell, User, Book, LogOut, Key } from 'react-feather';
 import { clientSignOut } from '@/app/auth/client-actions';
 
-
 export default function DashboardPage() {
-  // Get all necessary data from the hook
   const { user, profile, loading } = useAuth();
   const router = useRouter();
-  const handleSignOut = clientSignOut()
-  // This effect handles redirecting if the user logs out or isn't logged in
+  const [redirectAttempted, setRedirectAttempted] = useState(false);
+  const handleSignOut = clientSignOut();
+
+  // Use useEffect for redirect to avoid render-time state updates
   useEffect(() => {
-    // Only check for redirection after the initial loading is done
-    if (!loading && !user) {
+    if (!loading && !user && !redirectAttempted) {
+      console.log('🏠 Dashboard: No user, redirecting to login...');
+      setRedirectAttempted(true);
       router.push('/login');
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, redirectAttempted]);
+
+  // If redirect was attempted but we're still here, use hard redirect
+  useEffect(() => {
+    if (redirectAttempted && !user) {
+      console.log('🏠 Dashboard: Soft redirect failed, using hard redirect...');
+      const timer = setTimeout(() => {
+        window.location.href = '/login';
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [redirectAttempted, user]);
 
   // Show a loading spinner while the AuthContext is fetching data
   if (loading) {
@@ -32,9 +43,22 @@ export default function DashboardPage() {
     );
   }
 
-  // Fallback in case the redirect hasn't fired yet
-  if (!user || !profile) {
-    return null; 
+  // If no user but not loading, show redirect message
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center">
+        <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // User exists but profile is loading or missing
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center">
+        <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-blue-600"></div>
+      </div>
+    );
   }
 
   return (
@@ -48,7 +72,7 @@ export default function DashboardPage() {
               Welcome, {profile.full_name}!
             </h1>
             <p className="mt-1 text-md text-gray-500 dark:text-gray-400">
-              Student ID: {profile.student_id.split('@')[0]}
+              Student ID: {profile.student_id}
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-0">
@@ -59,15 +83,13 @@ export default function DashboardPage() {
               <Key size={18} />
               <span>Change Password</span>
             </button>
-            <form action={signOut}>
-              <button
-  onClick={handleSignOut}
-  className="cursor-pointer flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105"
->
-                <LogOut size={18} />
-                <span>Logout</span>
-              </button>
-            </form>
+            <button
+              onClick={handleSignOut}
+              className="cursor-pointer flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105"
+            >
+              <LogOut size={18} />
+              <span>Logout</span>
+            </button>
           </div>
         </header>
 
@@ -119,7 +141,7 @@ export default function DashboardPage() {
           </div>
           
           {/* Card 4: Resources */}
-          <div className="md:col-span-2 lg:col-span-3 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+          <div className="dark:bg-gray-800 md:col-span-2 lg:col-span-3 bg-white  p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
             <div className="flex items-center gap-4 mb-4">
               <div className="bg-yellow-100 dark:bg-yellow-900 p-3 rounded-full">
                 <Book className="text-yellow-600 dark:text-yellow-300" />

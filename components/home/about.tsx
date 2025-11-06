@@ -15,7 +15,7 @@ const aboutContent = {
 
 export default function About() {
   return (
-    <section id="about" className="py-24 bg-gray-100 px-6">
+    <section id="about" className="py-24 bg-gray-100 px-6 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
         <div className="flex justify-center md:justify-start">
           <img
@@ -25,14 +25,14 @@ export default function About() {
           />
         </div>
         <div className="text-center md:text-left">
-          <h2 className="text-4xl font-bold mb-6">{aboutContent.title}</h2>
-          <p className="text-lg text-gray-700 leading-relaxed mb-8">
+          <h2 className="text-4xl font-bold mb-6 dark:text-white">{aboutContent.title}</h2>
+          <p className="text-lg text-gray-700 leading-relaxed mb-8 dark:text-gray-300">
             {aboutContent.text}
           </p>
           <Link
             href="/about"
             className="inline-block px-8 py-3 font-semibold text-white bg-black/85 rounded-full 
-            transform transition-transform duration-300 hover:scale-110"
+            transform transition-transform duration-300 hover:scale-110 dark:bg-white dark:text-black"
           >
             Read More
           </Link>

@@ -1,13 +1,19 @@
+// tailwind.config.js
+
 /** @type {import('tailwindcss').Config} */
 
 export default {
-  darkMode: "class", // <-- ADD THIS LINE
+  darkMode: ["class"],
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
+      colors: {
+        'black': '#000000',
+        'light-black': '#343541',
+      },
       keyframes: {
         "stroke-draw": {
           to: { strokeDashoffset: "0" },

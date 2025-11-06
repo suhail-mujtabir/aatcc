@@ -75,7 +75,7 @@ const hero = {
         </section>
   
         {/* Who We Are */}
-        <section className="py-20 bg-gray-50">
+        <section className="dark:bg-dark-panel py-20 bg-gray-50">
           <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center px-6">
             <img
               src={aboutIntro.image}
@@ -83,8 +83,8 @@ const hero = {
               className="rounded-2xl shadow-lg"
             />
             <div>
-              <h2 className="text-3xl font-bold mb-6">{aboutIntro.title}</h2>
-              <p className="text-lg text-gray-700 leading-relaxed">
+              <h2 className="dark:text-white text-3xl font-bold mb-6">{aboutIntro.title}</h2>
+              <p className="dark:text-dark-muted text-lg text-gray-700 leading-relaxed">
                 {aboutIntro.text}
               </p>
             </div>
@@ -92,12 +92,12 @@ const hero = {
         </section>
   
         {/* Our Journey */}
-        <section className="py-20 bg-white">
-          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center px-6">
+        <section className="dark:bg-black py-20 ">
+          <div className="dark:bg-black max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center px-6">
             {/* Swap order for alternating layout */}
             <div className="order-2 md:order-1">
               <h2 className="text-3xl font-bold mb-6">{journey.title}</h2>
-              <p className="text-lg text-gray-700 leading-relaxed">
+              <p className="dark:text-dark-muted text-lg text-gray-700 leading-relaxed">
                 {journey.text}
               </p>
             </div>
@@ -110,7 +110,7 @@ const hero = {
         </section>
   
         {/* Mission */}
-        <section className="py-20 bg-green-50">
+        <section className="dark:bg-dark-panel py-20 bg-green-50">
           <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center px-6">
             <img
               src={missionVision.image}
@@ -121,7 +121,7 @@ const hero = {
               <h2 className="text-3xl font-bold mb-6">
                 {missionVision.mission.title}
               </h2>
-              <p className="text-lg text-gray-700 leading-relaxed">
+              <p className="dark:text-dark-muted text-lg text-gray-700 leading-relaxed">
                 {missionVision.mission.text}
               </p>
             </div>
@@ -129,13 +129,13 @@ const hero = {
         </section>
   
         {/* Vision */}
-        <section className="py-20 bg-green-100">
+        <section className="dark:bg-black py-20 bg-green-100">
           <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center px-6">
             <div>
               <h2 className="text-3xl font-bold mb-6">
                 {missionVision.vision.title}
               </h2>
-              <p className="text-lg text-gray-700 leading-relaxed">
+              <p className="dark:text-dark-muted text-lg text-gray-700 leading-relaxed">
                 {missionVision.vision.text}
               </p>
             </div>

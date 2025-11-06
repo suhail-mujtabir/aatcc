@@ -1,16 +1,15 @@
 // app/login/page.tsx
 "use client";
-
 import { useState, useEffect, useRef, FormEvent, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { createClient } from "@/lib/supabase/client";
 import { Lock, Eye, EyeOff, Moon } from "react-feather";
+import { loginUser } from "@/app/actions/auth-actions";
 
 declare global {
   interface Window {
     VANTA: any;
-    feather: any;
+    THREE: any;
   }
 }
 
@@ -23,12 +22,13 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [vantaReady, setVantaReady] = useState(false);
   
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
-  const supabase = createClient();
-  const vantaRef = useRef(null); 
+  const vantaRef = useRef<HTMLDivElement>(null);
+  const vantaEffect = useRef<any>(null);
 
   const redirectTo = searchParams.get('redirect') || '/dashboard';
 
@@ -37,6 +37,81 @@ function LoginForm() {
       router.push(redirectTo);
     }
   }, [user, router, redirectTo]);
+
+  // Load scripts dynamically
+  useEffect(() => {
+    const loadVantaScripts = async () => {
+      // Check if scripts are already loaded
+      if (window.VANTA && window.THREE) {
+        setVantaReady(true);
+        return;
+      }
+
+      try {
+        // Load Three.js first
+        if (!window.THREE) {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js';
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+        }
+
+        // Load Vanta.js
+        if (!window.VANTA) {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js';
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+        }
+
+        setVantaReady(true);
+      } catch (error) {
+        console.error('Failed to load Vanta.js scripts:', error);
+      }
+    };
+
+    loadVantaScripts();
+  }, []);
+
+  // Initialize Vanta effect when scripts are ready
+  useEffect(() => {
+    if (!vantaReady || !vantaRef.current || !window.VANTA) return;
+
+    // Destroy previous effect if it exists
+    if (vantaEffect.current) {
+      vantaEffect.current.destroy();
+    }
+
+    // Initialize Vanta effect
+    vantaEffect.current = window.VANTA.WAVES({
+      el: vantaRef.current,
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      color: 0x1e3a8a,
+      shininess: 35.00,
+      waveHeight: 15.00,
+      waveSpeed: 0.75,
+      zoom: 0.80
+    });
+
+    // Cleanup function
+    return () => {
+      if (vantaEffect.current) {
+        vantaEffect.current.destroy();
+      }
+    };
+  }, [vantaReady]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -48,26 +123,6 @@ function LoginForm() {
       document.documentElement.classList.remove('dark');
       setIsDark(false);
     }
-
-    const vantaEffect = window.VANTA && window.VANTA.WAVES({
-        el: vantaRef.current,
-        mouseControls: true,
-        touchControls: true,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        scale: 1.00,
-        scaleMobile: 1.00,
-        color: 0x1e3a8a,
-        shininess: 35.00,
-        waveHeight: 15.00,
-        waveSpeed: 0.75,
-        zoom: 0.80
-    });
-    
-    return () => {
-      if (vantaEffect) vantaEffect.destroy();
-    };
   }, []);
 
   const handleThemeToggle = () => {
@@ -82,30 +137,53 @@ function LoginForm() {
   };
   
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    const email = `${userId}@yourschool.com`;
+  try {
+    const formData = new FormData();
+    formData.append('userId', userId);
+    formData.append('password', password);
+    formData.append('rememberMe', rememberMe.toString());
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (signInError) {
-      setError("Invalid User ID or Password");
-      setLoading(false);
-      return;
+    console.log('🔐 Login: Attempting login...');
+    const result = await loginUser(formData);
+    
+    if (result?.error) {
+      setError(result.error);
+      console.log('🔐 Login: Failed -', result.error);
+    } else if (result?.success) {
+      // Login successful - use a more reliable redirect approach
+      console.log('🔐 Login: Success, waiting for auth sync...');
+      
+      // Wait a bit for the session to propagate
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Force a hard navigation to ensure clean state
+      window.location.href = redirectTo;
     }
-
-    router.push(redirectTo);
-    router.refresh();
-  };
+  } catch (err: any) {
+    console.error('🔐 Login: Error -', err);
+    setError(err.message || "An error occurred during login");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
-    <div className=" text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex items-center justify-center">
-      <div ref={vantaRef} id="vanta-bg"></div>
+    <div className="text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex items-center justify-center">
+      {/* Vanta background */}
+      <div 
+        ref={vantaRef} 
+        className="absolute top-0 left-0 w-full h-full"
+        style={{ zIndex: -1 }}
+      />
+      
+      {/* Show loading indicator while Vanta loads */}
+      {!vantaReady && (
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900" />
+      )}
       
       <div className="relative w-full max-w-md px-4 sm:px-6 py-6 sm:py-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-xl shadow-2xl overflow-hidden mx-4 sm:mx-0">
         {/* Theme Toggle */}
@@ -149,7 +227,7 @@ function LoginForm() {
               onChange={(e) => setUserId(e.target.value)}
               className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
             />
-            <label htmlFor="userid" className={`floating-label absolute left-4 top-3 text-gray-500 dark:text-gray-400 pointer-events-none ${userId ? 'active' : ''}`}>User ID</label>
+            <label htmlFor="userid" className={`floating-label absolute left-4 top-3 text-gray-500 dark:text-gray-400 pointer-events-none ${userId ? 'active' : ''}`}>User ID (eg. 23-01-001)</label>
           </div>
 
           {/* Password Field */}
@@ -162,6 +240,7 @@ function LoginForm() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              minLength={6}
               className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
             />
             <label htmlFor="password" className={`floating-label absolute left-4 top-3 text-gray-500 dark:text-gray-400 pointer-events-none ${password ? 'active' : ''}`}>Password</label>

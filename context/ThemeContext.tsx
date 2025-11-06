@@ -1,3 +1,5 @@
+// context/ThemeContext.tsx
+
 'use client';
 
 import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
@@ -13,16 +15,27 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    // ONLY check localStorage, ignore system preference
+    // Check both localStorage and system preference
     const savedTheme = localStorage.getItem('theme');
+    
     if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
       setIsDark(true);
-    } else {
-      // Default to light theme, ignore system preference
+    } else if (savedTheme === 'light') {
       document.documentElement.classList.remove('dark');
       setIsDark(false);
-      localStorage.setItem('theme', 'light'); // Set default to light
+    } else {
+      // No saved theme, check system preference
+      const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (systemIsDark) {
+        document.documentElement.classList.add('dark');
+        setIsDark(true);
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        setIsDark(false);
+        localStorage.setItem('theme', 'light');
+      }
     }
   }, []);
 

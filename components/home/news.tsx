@@ -1,4 +1,4 @@
-
+// components/home/news.tsx
 
 const newsContent = {
   title: "News & Announcements",
@@ -11,10 +11,10 @@ const newsContent = {
 
 export default function News() {
   return (
-    <section id="news" className="py-24 bg-white text-center px-6">
+    <section id="news" className="py-24 bg-white text-center px-6 dark:bg-pure-black">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-4xl font-bold mb-8">{newsContent.title}</h2>
-        <ul className="text-lg text-gray-700 space-y-4 text-left">
+        <h2 className="text-4xl font-bold mb-8 dark:text-white">{newsContent.title}</h2>
+        <ul className="text-lg text-gray-700 space-y-4 text-left dark:text-gray-300">
           {newsContent.items.map((item, idx) => (
             <li key={idx}>{item}</li>
           ))}

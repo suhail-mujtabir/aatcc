@@ -1,5 +1,5 @@
 "use client";
-
+import ThemeToggle from "./ThemeToggle";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -140,8 +140,8 @@ export default function Navbar() {
             height={40}
             className="rounded-md transition-transform duration-300 group-hover:scale-105 w-8 h-8 sm:w-10 sm:h-10"
           />
-          <span className="text-lg sm:text-xl font-bold tracking-wide hover:text-green-400 transition-colors duration-500 whitespace-nowrap">
-            AATCC Student Chapter
+          <span className="hidden sm:inline text-lg font-bold tracking-wide hover:text-green-400 transition-colors duration-500 whitespace-nowrap">
+            AATCC AUST Student Chapter
           </span>
         </Link>
 
@@ -183,12 +183,13 @@ export default function Navbar() {
               </div>
             </li>
           ))}
+          <li><ThemeToggle /></li>
         </ul>
 
         {/* AUTH BUTTONS - Desktop */}
         <div className="hidden lg:block pl-4 flex-shrink-0">
           {loading ? (
-            <div className="h-9 w-24 bg-gray-700/50 rounded-lg animate-pulse"></div>
+            <div className="h-9 w-24 bg-gray-700/50 rounded-lg"></div>
           ) : user ? (
             <Link
               href="/dashboard"
@@ -315,8 +316,11 @@ export default function Navbar() {
                 
                 {/* Mobile Auth Buttons */}
                 <div className="pt-4 border-t border-gray-800/50">
+                <div className="flex justify-center mb-4">
+    <ThemeToggle />
+  </div>
                   {loading ? (
-                    <div className="h-12 bg-gray-700/50 rounded-lg animate-pulse"></div>
+                    <div className="h-12 bg-gray-700/50 rounded-lg "></div>
                   ) : user ? (
                     <Link
                       href="/dashboard"

@@ -5,31 +5,25 @@ import { cookies } from 'next/headers'
 export async function createClient() {
   const cookieStore = await cookies()
 
+  // Use type assertion to fix the TypeScript warning
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        async get(name: string) {
-          return (await cookieStore).get(name)?.value
+        getAll() {
+          return cookieStore.getAll()
         },
-        async set(name: string, value: string, options: CookieOptions) {
+        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           try {
-            (await cookieStore).set({ name, value, ...options })
-          } catch (error) {
-            // The `set` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing user sessions.
-          }
-        },
-        async remove(name: string, options: CookieOptions) {
-          try {
-            (await cookieStore).set({ name, value: '', ...options })
-          } catch (error) {
-            // The `remove` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing user sessions.
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // Ignore errors in Server Components
           }
         },
       },
     }
-  )
+  ) as any // Temporary fix for TypeScript warning
 }

@@ -22,22 +22,27 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  text-align: left;
-  transition: all 0.5s ease-in-out;
-}
-
-/* When reveal is complete, change to block layout with left alignment */
-.logoHeader.revealComplete {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: center;
+  gap: 15px;
 }
 
-.logoHeader.revealComplete .secondPart {
-  width: auto !important;
-  display: block;
-  margin-left: 0 !important;
+.logoContainer {
+  opacity: 0;
+  transform: rotateX(-90deg);
+  transform-origin: top;
+  transition: all 0.8s ease-out;
+}
+
+.logoContainer.logoActive {
+  opacity: 1;
+  transform: rotateX(0deg);
+}
+
+.logoImage {
+  width: 58.041px; /* Matches font size */
+  height: 35.795px;
+  object-fit: contain;
 }
 
 .logo {
@@ -46,7 +51,6 @@
   bottom: -20px;
   opacity: 0;
   transition: ease-in-out 0.5s;
-  white-space: nowrap;
 }
 
 .logo.active {
@@ -60,13 +64,13 @@
   white-space: nowrap;
   font-family: system-ui, -apple-system, sans-serif;
   font-weight: bold;
-  font-size: 2rem;
 }
 
 /* First Part - "AATCC" - Blue color with fade animation */
 .firstPart {
-  color: #004466;
+  color: #ffffff;
   animation: showup 7s infinite;
+  font-size: 2rem;
 }
 
 /* Second Part - "AUST Student Chapter" - Green color with typewriter reveal animation */
@@ -74,6 +78,7 @@
   color: #008844;
   width: 0px;
   animation: reveal 7s infinite;
+  font-size: 2rem;
 }
 
 .slideInText {
@@ -121,21 +126,34 @@
     width: 0px;
   }
   30% {
-    width: 420px; /* Width for " AUST Student Chapter" */
+    width: 380px; /* Adjusted for " AUST Student Chapter" text width */
   }
   80% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    width: 420px;
+    width: 380px;
   }
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
-  .anime {
-    font-size: 2rem;
+  .logoHeader {
+    gap: 12px;
+  }
+  
+  .logoImage {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  .firstPart {
+    font-size: 1.3rem;
+  }
+  
+  .secondPart {
+    font-size: 1.3rem;
   }
   
   @keyframes reveal {
@@ -148,21 +166,34 @@
       width: 0px;
     }
     30% {
-      width: 280px;
+      width: 240px; /* Adjusted for mobile */
     }
     80% {
       opacity: 1;
     }
     100% {
       opacity: 0;
-      width: 280px;
+      width: 240px;
     }
   }
 }
 
 @media (max-width: 480px) {
-  .anime {
-    font-size: 1.5rem;
+  .logoHeader {
+    gap: 10px;
+  }
+  
+  .logoImage {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .firstPart {
+    font-size: 1rem;
+  }
+  
+  .secondPart {
+    font-size: 1rem;
   }
   
   @keyframes reveal {
@@ -175,14 +206,14 @@
       width: 0px;
     }
     30% {
-      width: 220px;
+      width: 200px; /* Adjusted for small mobile */
     }
     80% {
       opacity: 1;
     }
     100% {
       opacity: 0;
-      width: 220px;
+      width: 200px;
     }
   }
 }

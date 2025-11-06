@@ -1,3 +1,5 @@
+// components/home/activities.tsx
+
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -70,11 +72,11 @@ export default function Activities() {
   return (
     <section
       id="activities"
-      className="py-24 bg-white px-6"
+      className="py-24 bg-white px-6 dark:bg-pure-black"
       ref={activitiesRef}
     >
       <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-4xl font-bold mb-12">
+        <h2 className="text-4xl font-bold mb-12 dark:text-white">
           {activitiesContent.title}
         </h2>
         <div className="grid md:grid-cols-3 gap-10">
@@ -83,15 +85,15 @@ export default function Activities() {
             return (
               <div
                 key={idx}
-                className="p-8 bg-gray-50 shadow-lg rounded-2xl hover:shadow-xl transition"
+                className="p-8 bg-gray-50 shadow-lg rounded-2xl hover:shadow-xl transition dark:bg-gray-800 dark:shadow-gray-700/20"
               >
-                <h3 className="text-2xl font-semibold mb-2">
+                <h3 className="text-2xl font-semibold mb-2 dark:text-white">
                   {card.heading}
                 </h3>
-                <p className="text-4xl font-bold text-green-600 mb-4">
+                <p className="text-4xl font-bold text-green-600 mb-4 dark:text-green-400">
                   {count}
                 </p>
-                <p className="text-gray-600">{card.text}</p>
+                <p className="text-gray-600 dark:text-gray-300">{card.text}</p>
               </div>
             );
           })}
