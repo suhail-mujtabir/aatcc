@@ -14,6 +14,10 @@ interface PasswordInputProps {
   isValid?: boolean
   isConfirm?: boolean
   passwordsMatch?: boolean
+  onPaste?: (e: React.ClipboardEvent<HTMLInputElement>) => void
+  onCopy?: (e: React.ClipboardEvent<HTMLInputElement>) => void
+  onCut?: (e: React.ClipboardEvent<HTMLInputElement>) => void
+  isSameAsCurrent?: boolean
 }
 
 export default function PasswordInput({
@@ -28,10 +32,18 @@ export default function PasswordInput({
   autoComplete,
   isValid,
   isConfirm,
-  passwordsMatch
+  passwordsMatch,
+  onPaste,
+  onCopy,
+  onCut,
+  isSameAsCurrent
 }: PasswordInputProps) {
   const getBorderColor = () => {
     if (!value) return 'border-gray-200/50 dark:border-gray-700/50 focus:border-blue-500 dark:focus:border-blue-400'
+    
+    if (isSameAsCurrent) {
+      return 'border-red-500/70 dark:border-red-400/70 focus:border-red-500 dark:focus:border-red-400'
+    }
     
     if (isConfirm) {
       return passwordsMatch 
@@ -57,6 +69,9 @@ export default function PasswordInput({
           required
           value={value}
           onChange={onChange}
+          onPaste={onPaste}
+          onCopy={onCopy}
+          onCut={onCut}
           className={`w-full bg-white/50 dark:bg-gray-800/50 border-2 rounded-2xl px-4 py-3 focus:outline-none focus:bg-white/80 dark:focus:bg-gray-800/80 transition-all duration-300 backdrop-blur-sm placeholder-gray-500 dark:placeholder-gray-400 ${getBorderColor()}`}
           placeholder={placeholder}
           autoComplete={autoComplete}
@@ -92,6 +107,16 @@ export default function PasswordInput({
             {passwordsMatch ? '✓' : '✗'}
           </span>
           {passwordsMatch ? 'Passwords match perfectly' : 'Passwords do not match'}
+        </div>
+      )}
+
+      {/* Same as current password warning */}
+      {isSameAsCurrent && (
+        <div className="mt-2 flex items-center text-sm font-medium text-red-600 dark:text-red-400 transition-all duration-300">
+          <span className="w-5 h-5 mr-2 rounded-full flex items-center justify-center text-xs bg-red-100 dark:bg-red-900/30">
+            ✗
+          </span>
+          New password cannot be the same as current password
         </div>
       )}
     </div>
