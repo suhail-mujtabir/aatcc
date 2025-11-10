@@ -36,6 +36,7 @@ export default function ChangePasswordForm() {
   const [passwordsMatch, setPasswordsMatch] = useState(true)
   const [allRequirementsMet, setAllRequirementsMet] = useState(false)
   const [isRedirecting, setIsRedirecting] = useState(false)
+  const [isSameAsCurrent, setIsSameAsCurrent] = useState(false)
 
   // Redirect after successful password change
   useEffect(() => {
@@ -68,12 +69,38 @@ export default function ChangePasswordForm() {
     )
   }, [formData.newPassword, formData.confirmPassword])
 
+  // Check if new password is same as current password
+  useEffect(() => {
+    setIsSameAsCurrent(
+      formData.newPassword !== '' && 
+      formData.currentPassword !== '' && 
+      formData.newPassword === formData.currentPassword
+    )
+  }, [formData.newPassword, formData.currentPassword])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const canSubmit = allRequirementsMet && passwordsMatch && formData.currentPassword && formData.newPassword && formData.confirmPassword && !isPending && !isRedirecting
+  // Prevent paste in all password fields
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault()
+  }
+
+  // Prevent copy/cut in all password fields
+  const handleCopyCut = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault()
+  }
+
+  const canSubmit = allRequirementsMet && 
+                   passwordsMatch && 
+                   !isSameAsCurrent &&
+                   formData.currentPassword && 
+                   formData.newPassword && 
+                   formData.confirmPassword && 
+                   !isPending && 
+                   !isRedirecting
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
@@ -110,6 +137,9 @@ export default function ChangePasswordForm() {
               onTogglePassword={() => setShowPassword(prev => ({ ...prev, current: !prev.current }))}
               placeholder="Enter your current password"
               autoComplete="current-password"
+              onPaste={handlePaste}
+              onCopy={handleCopyCut}
+              onCut={handleCopyCut}
             />
 
             {/* New Password */}
@@ -124,12 +154,17 @@ export default function ChangePasswordForm() {
                 onTogglePassword={() => setShowPassword(prev => ({ ...prev, new: !prev.new }))}
                 placeholder="Create new password"
                 autoComplete="new-password"
-                isValid={allRequirementsMet}
+                isValid={allRequirementsMet && !isSameAsCurrent}
+                onPaste={handlePaste}
+                onCopy={handleCopyCut}
+                onCut={handleCopyCut}
+                isSameAsCurrent={isSameAsCurrent}
               />
               
               <PasswordRequirements 
                 requirements={requirements} 
                 newPassword={formData.newPassword} 
+                isSameAsCurrent={isSameAsCurrent}
               />
             </div>
 
@@ -146,6 +181,9 @@ export default function ChangePasswordForm() {
               autoComplete="new-password"
               isConfirm={true}
               passwordsMatch={passwordsMatch}
+              onPaste={handlePaste}
+              onCopy={handleCopyCut}
+              onCut={handleCopyCut}
             />
 
             <SubmitButton 
@@ -158,7 +196,10 @@ export default function ChangePasswordForm() {
             {!canSubmit && formData.newPassword && (
               <div className="text-center p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/30 rounded-xl">
                 <p className="text-sm text-orange-700 dark:text-orange-300">
-                  Complete all security requirements to continue
+                  {isSameAsCurrent 
+                    ? "New password cannot be the same as current password" 
+                    : "Complete all security requirements to continue"
+                  }
                 </p>
               </div>
             )}
