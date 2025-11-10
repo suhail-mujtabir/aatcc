@@ -35,6 +35,10 @@ export async function changePassword(prevState: ActionState, formData: FormData)
   if (newPassword.length < 8) {
     return { error: 'Password must be at least 8 characters' }
   }
+  // Check if new password is same as current password
+  if (newPassword === currentPassword) {
+  return { error: 'New password cannot be the same as current password' }
+  }
 
   const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
   if (!specialCharRegex.test(newPassword)) {
