@@ -1,8 +1,7 @@
-// app/change-password/actions.ts
+// app/change-password/action.ts
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export type ActionState = {
@@ -16,7 +15,7 @@ export async function changePassword(prevState: ActionState, formData: FormData)
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   
   if (authError || !user) {
-    redirect('/login?redirect=/change-password')
+    return { error: 'Authentication required' }
   }
 
   const currentPassword = formData.get('currentPassword') as string
@@ -32,18 +31,16 @@ export async function changePassword(prevState: ActionState, formData: FormData)
     return { error: 'New passwords do not match' }
   }
 
-  // SIMPLIFIED: Better password strength validation
+  // Password strength validation
   if (newPassword.length < 8) {
     return { error: 'Password must be at least 8 characters' }
   }
 
-  // Check for at least one special character
   const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
   if (!specialCharRegex.test(newPassword)) {
     return { error: 'Password must contain at least one special character' }
   }
 
-  // Check for at least one letter
   const letterRegex = /[a-zA-Z]/
   if (!letterRegex.test(newPassword)) {
     return { error: 'Password must contain at least one letter' }
@@ -70,5 +67,4 @@ export async function changePassword(prevState: ActionState, formData: FormData)
 
   revalidatePath('/change-password')
   return { success: 'Password updated successfully!' }
-  redirect('/dashboard')
 }
