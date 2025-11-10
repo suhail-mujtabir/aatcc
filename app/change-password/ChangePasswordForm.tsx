@@ -2,6 +2,7 @@
 'use client'
 
 import { useState, useActionState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { changePassword, type ActionState } from './action'
 
 interface PasswordRequirements {
@@ -11,6 +12,7 @@ interface PasswordRequirements {
 }
 
 export default function ChangePasswordForm() {
+  const router = useRouter()
   const [state, formAction, isPending] = useActionState(changePassword, null)
   const [formData, setFormData] = useState({
     currentPassword: '',
@@ -29,6 +31,19 @@ export default function ChangePasswordForm() {
   })
   const [passwordsMatch, setPasswordsMatch] = useState(true)
   const [allRequirementsMet, setAllRequirementsMet] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(false)
+
+  // Redirect after successful password change
+  useEffect(() => {
+    if (state?.success) {
+      setIsRedirecting(true)
+      const timer = setTimeout(() => {
+        router.push('/dashboard') // Smooth client-side navigation
+      }, 2000) // Redirect after 2 seconds
+      
+      return () => clearTimeout(timer)
+    }
+  }, [state?.success, router])
 
   // Real-time password validation
   useEffect(() => {
@@ -54,7 +69,7 @@ export default function ChangePasswordForm() {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const canSubmit = allRequirementsMet && passwordsMatch && formData.currentPassword && formData.newPassword && formData.confirmPassword && !isPending
+  const canSubmit = allRequirementsMet && passwordsMatch && formData.currentPassword && formData.newPassword && formData.confirmPassword && !isPending && !isRedirecting
 
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
@@ -101,7 +116,7 @@ export default function ChangePasswordForm() {
               required
               value={formData.newPassword}
               onChange={handleInputChange}
-              className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              className={`Dark:text-gray-300 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                 formData.newPassword ? (allRequirementsMet ? 'border-green-500' : 'border-red-500') : 'border-gray-300'
               }`}
               placeholder="Enter new password"
@@ -187,7 +202,7 @@ export default function ChangePasswordForm() {
           disabled={!canSubmit}
           className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 font-medium"
         >
-          {isPending ? 'Updating Password...' : 'Change Password'}
+          {isRedirecting ? 'Redirecting...' : isPending ? 'Updating Password...' : 'Change Password'}
         </button>
 
         {/* Form Status */}
@@ -203,7 +218,13 @@ export default function ChangePasswordForm() {
       {/* Success/Error Messages from Server */}
       {state?.success && (
         <div className="mt-4 p-3 bg-green-100 text-green-800 border border-green-200 rounded-md">
-          {state.success}
+          <div className="flex items-center">
+            <span className="mr-2">✓</span>
+            {state.success}
+          </div>
+          <div className="mt-2 text-sm text-green-700">
+            Redirecting to dashboard in 2 seconds...
+          </div>
         </div>
       )}
       
