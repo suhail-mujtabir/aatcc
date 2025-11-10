@@ -1,7 +1,7 @@
 // app/change-password/page.tsx
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import ChangePasswordForm from './ChangePasswordForm'
+import  ChangePasswordForm  from './components/ChangePasswordForm'
 
 export default async function ChangePasswordPage() {
   const supabase = await createClient()
