@@ -35,11 +35,11 @@ export default function InfiniteScrollTestimonials() {
               direction="right"
             />
             
-            <ScrollLine 
+            {/* <ScrollLine 
               testimonials={line3} 
               speed={70} 
               direction="left"
-            />
+            /> */}
           </div>
         </div>
       </div>

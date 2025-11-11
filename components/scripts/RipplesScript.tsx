@@ -24,7 +24,7 @@ export default function RipplesScript() {
             dropRadius: 20,
             perturbance: 0.04,
           });
-          console.log("🔄 Ripples re-initialized on navigation");
+          // console.log("🔄 Ripples re-initialized on navigation");
         } catch (e) {
           // Ignore errors (usually means already initialized)
         }
@@ -43,7 +43,7 @@ export default function RipplesScript() {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/jquery.ripples@0.5.3/jquery.ripples.min.js';
         script.onload = () => {
-          console.log("Ripples loaded");
+          // console.log("Ripples loaded");
           setTimeout(() => {
             if (window.$ && window.$.fn.ripples) {
               window.$(".water").ripples({
@@ -51,7 +51,7 @@ export default function RipplesScript() {
                 dropRadius: 20,
                 perturbance: 0.04,
               });
-              console.log("✅ Ripples initialized!");
+              // console.log("✅ Ripples initialized!");
             }
           }, 100);
         };
