@@ -7,10 +7,9 @@ import { AuthProvider } from "@/context/AuthContext";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import { ThemeProvider } from '@/context/ThemeContext';
-import  Transitions  from "@/context/pageTransition";
 import SnowEffect from '@/components/SnowEffect';
 import ClickSpark from "@/components/clickSpark";
-
+import {ReactLenis} from '@/components/utils/lenis';
 
 export const metadata: Metadata = {
   title: "AATCC AUST Student Chapter",
@@ -38,11 +37,13 @@ export default function RootLayout({
   duration={400}
             >
             <Navbar />
-            <Transitions>
+           
+              <ReactLenis root>
               <main className="flex-grow">
                 {children}
               </main>
-            </Transitions>
+              </ReactLenis>
+            
             <Footer/>
             <ScrollToTop />
             </ClickSpark>

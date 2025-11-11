@@ -80,8 +80,8 @@ body {
   animation: stroke-draw 2s linear forwards;
 }
 
-@tailwind base;
-@tailwind components;
+/* @tailwind base;
+@tailwind components; */
 @tailwind utilities;
 
 .hero-with-overlay::before {
