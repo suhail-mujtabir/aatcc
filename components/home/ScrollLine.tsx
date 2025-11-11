@@ -6,7 +6,6 @@ import TestimonialCard from './TestimonialCard';
 interface Testimonial {
   id: number;
   name: string;
-  role: string;
   image: string;
   testimonial: string;
   facebookUrl: string;

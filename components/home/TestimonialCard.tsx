@@ -4,7 +4,6 @@
 interface Testimonial {
   id: number;
   name: string;
-  role: string;
   image: string;
   testimonial: string;
   facebookUrl: string;
@@ -41,9 +40,6 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-gray-900 dark:text-dark-main truncate">
             {testimonial.name}
-          </p>
-          <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-            {testimonial.role}
           </p>
         </div>
       </div>
