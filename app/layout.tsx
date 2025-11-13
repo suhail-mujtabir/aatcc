@@ -1,6 +1,6 @@
 // app/layout.tsx
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Navbar from "../components/Navbar";
 import { AuthProvider } from "@/context/AuthContext";
 import Footer from "@/components/Footer";
@@ -9,6 +9,16 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import SnowEffect from '@/components/SnowEffect';
 import ClickSpark from "@/components/clickSpark";
 import {ReactLenis} from '@/components/utils/lenis';
+
+// Viewport configuration (includes theme color)
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#D23139" },
+    { media: "(prefers-color-scheme: dark)", color: "#D23139" }
+  ],
+  width: 'device-width',
+  initialScale: 1,
+}
 
 // SEO & Open Graph Metadata
 export const metadata: Metadata = {
@@ -99,12 +109,6 @@ export const metadata: Metadata = {
   // Manifest for PWA (optional)
   manifest: "/manifest.json",
   
-  // Theme color
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#D23139" },
-    { media: "(prefers-color-scheme: dark)", color: "#D23139" }
-  ],
-  
   // Verification (add these when you set up)
   // verification: {
   //   google: "your-google-verification-code",
@@ -176,6 +180,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <AuthProvider>
+            <SnowEffect snowflakeCount={70}/>
             <ClickSpark
               sparkSize={10}
               sparkRadius={15}

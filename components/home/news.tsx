@@ -93,7 +93,7 @@ export default function News() {
         <div className="grid lg:grid-cols-2 gap-12 items-center w-full py-12">
           {/* Left side - Text content with TextReveal */}
           <div className="z-10 space-y-6">
-            <h2 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight text-gray-900 dark:text-white">
+            <h2 className="text-4xl font-bold text-left mb-12 dark:text-white">
               Latest News
             </h2>
             

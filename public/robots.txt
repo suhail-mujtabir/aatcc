@@ -6,7 +6,6 @@ Allow: /
 Allow: /about
 Allow: /team
 Allow: /activities
-Allow: /hall-of-fame
 Allow: /hof
 Allow: /contact
 

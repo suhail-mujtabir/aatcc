@@ -34,10 +34,14 @@ export default function Navbar() {
   const isHome = pathname === "/";
   const isDashboard = pathname.startsWith("/dashboard");
   const isLoginPage = pathname === "/login";
+  const isAbout = pathname === "/about";
 
-  // Handle scroll behavior on homepage
+  // Pages that should have transparent navbar initially
+  const hasScrollBehavior = isHome || isAbout;
+
+  // Handle scroll behavior on pages with hero sections
   useEffect(() => {
-    if (isHome) {
+    if (hasScrollBehavior) {
       const handleScroll = () => {
         setScrolled(window.scrollY > 50);
       };
@@ -47,7 +51,7 @@ export default function Navbar() {
     } else {
       setScrolled(true);
     }
-  }, [isHome]);
+  }, [hasScrollBehavior]);
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -83,12 +87,12 @@ export default function Navbar() {
         transition={{ 
           duration: 0.5, 
           ease: "easeOut",
-          delay: isHome ? 4.5 : 0
+          delay: isHome ? 4.5 : 0  // Only delay on homepage
         }}
         className={`${
           isDashboard ? 'sticky' : 'fixed'
         } top-0 left-0 w-full z-50 transition-colors duration-500 ${
-          !isHome || scrolled ? "bg-black/85 backdrop-blur-md" : "bg-transparent"
+          !hasScrollBehavior || scrolled ? "bg-black/85 backdrop-blur-md" : "bg-transparent"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between text-white">
@@ -303,8 +307,8 @@ export default function Navbar() {
         </AnimatePresence>
       </motion.nav>
 
-      {/* Spacer for non-home pages to prevent content from going under navbar */}
-      {!isHome && !isDashboard && (
+      {/* Spacer for pages that don't have hero sections */}
+      {!isHome && !isDashboard && !isAbout && (
         <div className="h-[62px]" />
       )}
     </>

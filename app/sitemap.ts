@@ -38,15 +38,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     
-    // Hall of Fame - Medium-high priority
-    {
-      url: `${baseUrl}/hall-of-fame`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    
-    // HOF (alternative hall of fame page)
+    // Hall of Fame
     {
       url: `${baseUrl}/hof`,
       lastModified: currentDate,
