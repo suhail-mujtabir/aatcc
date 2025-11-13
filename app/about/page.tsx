@@ -1,6 +1,7 @@
 // app/about/page.tsx
+'use client';
 
-
+import TextReveal , {TextFadeIn} from '@/components/Textreveal';
 const hero = {
     title: "About Us",
     subtitle:
@@ -69,8 +70,10 @@ const hero = {
             <div className="absolute inset-0 bg-black/50" /> {/* Overlay */}
           </div>
           <div className="relative z-10">
-            <h1 className="text-5xl font-bold mb-4">{hero.title}</h1>
-            <p className="text-lg max-w-2xl mx-auto">{hero.subtitle}</p>
+            
+            <h1 className="text-5xl font-bold mb-4"><TextFadeIn>{hero.title}</TextFadeIn></h1>
+           
+            <p className="text-lg max-w-2xl mx-auto"><TextReveal duration={1} delay={0}>{hero.subtitle}</TextReveal></p>
           </div>
         </section>
   
@@ -83,9 +86,9 @@ const hero = {
               className="rounded-2xl shadow-lg"
             />
             <div>
-              <h2 className="dark:text-white text-3xl font-bold mb-6">{aboutIntro.title}</h2>
+              <h2 className="dark:text-white text-3xl font-bold mb-6"><TextFadeIn>{aboutIntro.title}</TextFadeIn></h2>
               <p className="dark:text-dark-muted text-lg text-gray-700 leading-relaxed">
-                {aboutIntro.text}
+                <TextReveal duration={2} delay={30}>{aboutIntro.text}</TextReveal>
               </p>
             </div>
           </div>
@@ -96,9 +99,9 @@ const hero = {
           <div className="dark:bg-black max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center px-6">
             {/* Swap order for alternating layout */}
             <div className="order-2 md:order-1">
-              <h2 className="text-3xl font-bold mb-6">{journey.title}</h2>
+              <h2 className="text-3xl font-bold mb-6"><TextFadeIn>{journey.title}</TextFadeIn></h2>
               <p className="dark:text-dark-muted text-lg text-gray-700 leading-relaxed">
-                {journey.text}
+                <TextReveal duration={2} delay={30}>{journey.text}</TextReveal>
               </p>
             </div>
             <img
@@ -119,10 +122,10 @@ const hero = {
             />
             <div>
               <h2 className="text-3xl font-bold mb-6">
-                {missionVision.mission.title}
+                <TextFadeIn>{missionVision.mission.title}</TextFadeIn>
               </h2>
               <p className="dark:text-dark-muted text-lg text-gray-700 leading-relaxed">
-                {missionVision.mission.text}
+                <TextReveal duration={2} delay={30}>{missionVision.mission.text}</TextReveal>
               </p>
             </div>
           </div>
@@ -136,7 +139,7 @@ const hero = {
                 {missionVision.vision.title}
               </h2>
               <p className="dark:text-dark-muted text-lg text-gray-700 leading-relaxed">
-                {missionVision.vision.text}
+                <TextReveal duration={2} delay={30}>{missionVision.vision.text}</TextReveal>
               </p>
             </div>
             <img

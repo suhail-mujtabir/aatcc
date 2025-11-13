@@ -18,7 +18,7 @@ export default function Hero({ handleScrollClick }: HeroProps) {
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8,delay: 4 }}
           className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 leading-tight"
         >
           AATCC AUST Student Chapter

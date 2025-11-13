@@ -2,7 +2,7 @@
 
 import About from "@/components/home/about";
 import Activities from "@/components/home/activities";
-import HallOfFame from "@/components/home/hof";
+import HallOfFame from "@/app/hof/hof";
 import Hero from "@/components/home/hero";
 import News from "@/components/home/news";
 import RipplesScript from "@/components/scripts/RipplesScript";
@@ -24,7 +24,7 @@ export default function Home() {
     
         <Activities />
         <InfiniteScrollTestimonials />
-        <HallOfFame />
+        {/* <HallOfFame /> */}
         <News />
       </div>
 

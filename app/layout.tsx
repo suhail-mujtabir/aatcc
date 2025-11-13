@@ -26,7 +26,7 @@ export default function RootLayout({
       
       <body>
         
-        <SnowEffect snowflakeCount={70} />
+        {/* <SnowEffect snowflakeCount={70} /> */}
         <ThemeProvider>
           {/* <PageThemeTransition /> */}
           <AuthProvider>

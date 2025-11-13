@@ -1,6 +1,7 @@
-
+'use client';
 
 import Link from "next/link";
+import TextReveal, {TextFadeIn} from "../Textreveal";
 
 const aboutContent = {
   title: "About Us",
@@ -25,9 +26,15 @@ export default function About() {
           />
         </div>
         <div className="text-center md:text-left">
-          <h2 className="text-4xl font-bold mb-6 dark:text-white">{aboutContent.title}</h2>
+          <h2 className="text-4xl font-bold mb-6 dark:text-white">
+          <TextFadeIn>
+            {aboutContent.title}
+          </TextFadeIn>
+          </h2>
           <p className="text-lg text-gray-700 leading-relaxed mb-8 dark:text-gray-300">
+            <TextReveal duration={2} delay={500}>
             {aboutContent.text}
+          </TextReveal>
           </p>
           <Link
             href="/about"

@@ -80,8 +80,8 @@ body {
   animation: stroke-draw 2s linear forwards;
 }
 
-/* @tailwind base;
-@tailwind components; */
+
+/* @import "tailwindcss/preflight"; */
 @tailwind utilities;
 
 .hero-with-overlay::before {
@@ -420,4 +420,17 @@ input:autofill {
 .dark input:autofill {
   background-clip: text;
   -webkit-background-clip: text;
+}
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 15s linear infinite;
+  width: max-content;
 }

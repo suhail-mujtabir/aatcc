@@ -60,30 +60,34 @@ export default function Footer() {
             </h3>
             <div className="flex justify-center md:justify-start space-x-4 sm:space-x-6 text-xl sm:text-2xl">
               <a 
-                href="#" 
+                href="https://www.facebook.com/AATCC.AUST/" 
                 className="hover:text-blue-500 transition-colors duration-200 transform hover:scale-110 dark:text-gray-300 dark:hover:text-blue-500"
                 aria-label="Facebook"
+                target="_blank"
               >
                 <FaFacebook />
               </a>
               <a 
-                href="#" 
+                href="https://www.instagram.com/aatcc.aust" 
                 className="hover:text-pink-500 transition-colors duration-200 transform hover:scale-110 dark:text-gray-300 dark:hover:text-pink-500"
                 aria-label="Instagram"
+                target="_blank"
               >
                 <FaInstagram />
               </a>
               <a 
-                href="#" 
+                href="https://www.linkedin.com/company/austaatcc" 
                 className="hover:text-blue-400 transition-colors duration-200 transform hover:scale-110 dark:text-gray-300 dark:hover:text-blue-400"
                 aria-label="LinkedIn"
+                target="_blank"
               >
                 <FaLinkedin />
               </a>
               <a 
-                href="#" 
+                href="mailto:aatccaust@gmail.com" 
                 className="hover:text-blue-500 transition-colors duration-200 transform hover:scale-110 dark:text-gray-300 dark:hover:text-blue-400"
                 aria-label="Email"
+                target="_blank"
               >
                 <MdEmail />
               </a>
