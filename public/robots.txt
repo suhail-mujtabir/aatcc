@@ -1,0 +1,30 @@
+# robots.txt for AATCC AUST Student Chapter
+
+# Allow all search engines to crawl public pages
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /team
+Allow: /activities
+Allow: /hall-of-fame
+Allow: /hof
+Allow: /contact
+
+# Block private/member-only areas
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /change-password
+Disallow: /api/
+
+# Block Next.js internal folders
+Disallow: /_next/
+Disallow: /static/
+
+# Block authentication pages from indexing (no SEO value)
+Disallow: /login
+
+# Sitemap location
+Sitemap: https://aatcc.vercel.app/sitemap.xml
+
+# Crawl-delay (be nice to servers) - optional
+# Crawl-delay: 1
