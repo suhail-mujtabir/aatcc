@@ -3,40 +3,16 @@
 import { useState, useEffect, useRef } from 'react';
 import CardSwap, { Card } from '../CardSwap';
 import TextReveal, { TextFadeIn } from '../Textreveal';
+import newsDataImport from '@/data/news.json';
 
-const newsData = [
-  {
-    id: 1,
-    title: '🧵 Texposium 1.0: Showcasing Student Innovation in Textiles',
-    content: `The AATCC AUST Student Chapter hosted Texposium 1.0, 
-    a vibrant poster presentation where ten teams shared creative ideas on textile science, 
-    sustainability, and design. Supported by Techno Colour Craft Ltd. and MTM Intending, 
-    the event celebrated innovation, teamwork, and the bright future of Bangladesh\'s textile industry.`,
-    img: 'https://textiletoday.com.bd/storage/uploads/2025/9/2679LlokWwl6o7DTDjc2.png',
-    link: 'https://textiletoday.com.bd/aust-student-chapter-hosts-texposium-showcase-textile-ingenuity'
-  },
-  {
-    id: 2,
-    title: '🧶 Texposium 1.0: A stage where textile meets Brilliance',
-    content: `The AATCC AUST Student Chapter hosted TexPosium 1.0, 
-    a vibrant poster presentation showcasing student creativity and research in textiles. 
-    Ten teams presented innovative ideas on sustainability, design, and textile science, 
-    with top performers receiving BDT 3,000 in prizes. The event fostered dialogue between students and experts, 
-    celebrating teamwork, innovation, and the bright future of Bangladesh’s textile industry.`,
-    img: 'https://textilefocus.com/wp-content/uploads/2025/09/f1c7e447-1895-4587-83b3-e67c93c74923.jpg',
-    link: 'https://textilefocus.com/texposium-1-0-where-textile-meets-brilliance'
-  },
-  {
-    id: 3,
-    title: '🎤 AATCC AUST Partners with Textile Focus for INSPIRATION!',
-    content: `We’re excited to announce our Club Partner, the AATCC–AUST Student Chapter, 
-    for Textile Focus’s Public Speaking Session — INSPIRATION! 🌟 Their collaboration highlights a shared commitment to empowering voices, 
-    fostering dialogue, and inspiring the textile community. Stay tuned for event highlights and stories that motivate, 
-    connect, and spark creativity! `,
-    img: 'https://imglink.io/i/9ebcdda2-42a5-49f6-851d-f4531e46dcd8.jpg',
-    link: 'https://www.facebook.com/photo/?fbid=1134215405589614&set=gm.3301847689983890&idorvanity=3272361916265801'
-  },
-];
+// Transform JSON data to match component's expected format
+const newsData = newsDataImport.featuredNews.map(item => ({
+  id: item.id,
+  title: item.title,
+  content: item.excerpt,
+  img: item.image,
+  link: item.link
+}));
 
 export default function News() {
   const [currentCardId, setCurrentCardId] = useState(newsData[0].id);

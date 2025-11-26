@@ -16,6 +16,21 @@ const nextConfig: NextConfig = {
         hostname: 'i.imgur.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'textiletoday.com.bd',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'textilefocus.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'imglink.io',
+        pathname: '/**',
+      },
     ],
   },
 };

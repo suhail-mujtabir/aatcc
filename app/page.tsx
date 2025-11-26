@@ -4,6 +4,7 @@ import About from "@/components/home/about";
 import Activities from "@/components/home/activities";
 import Hero from "@/components/home/hero";
 import News from "@/components/home/news";
+import NewsCarousel from "@/components/news/NewsCarousel";
 import RipplesScript from "@/components/scripts/RipplesScript";
 import { handleScrollClick } from "@/components/utils/smoothScroll"; // <-- Imports the new function
 import Intro from '@/components/intro/intro';
@@ -23,9 +24,16 @@ export default function Home() {
     
         <Activities />
         <InfiniteScrollTestimonials />
-        {/* <HallOfFame /> */}
-        <div className="hidden md:block"> <News /></div>
-       
+        
+        {/* Desktop News Component */}
+        <div className="hidden lg:block">
+          <News />
+        </div>
+        
+        {/* Mobile News Carousel */}
+        <div className="block lg:hidden">
+          <NewsCarousel />
+        </div>
       </div>
 
     </>
