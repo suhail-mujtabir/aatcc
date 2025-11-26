@@ -2,7 +2,9 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
+import activitiesData from "@/data/activities.json";
+import { Activity } from "@/types/activities";
 
 const activitiesContent = {
   title: "Activities",
@@ -10,17 +12,17 @@ const activitiesContent = {
     {
       heading: "Workshops",
       text: "Practical learning sessions on the latest technologies to build real-world skills.",
-      count: 12,
+      category: "workshop" as const,
     },
     {
-      heading: "Seminars",
-      text: "Talks from experts and industry leaders to broaden knowledge and inspire innovation.",
-      count: 8,
+      heading: "Events",
+      text: "Engaging activities, competitions, and gatherings to connect and learn together.",
+      category: "events" as const,
     },
     {
-      heading: "Community",
-      text: "Building a vibrant student community through events, networking, and collaboration.",
-      count: 15,
+      heading: "Industrial Visits",
+      text: "Industry exposure through visits to leading companies and facilities.",
+      category: "industrial-visit" as const,
     },
   ],
 };
@@ -55,6 +57,26 @@ export default function Activities() {
   const activitiesRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
 
+  // Calculate activity counts by category using useMemo for performance
+  const activityCounts = useMemo(() => {
+    // Flatten the activities array in case there's nested structure
+    let activities = activitiesData.activities as Activity[];
+    
+    // Handle nested activities structure (if present in JSON)
+    const flatActivities = activities.flatMap((item: any) => {
+      if (item.activities && Array.isArray(item.activities)) {
+        return item.activities;
+      }
+      return item;
+    });
+    
+    return {
+      workshop: flatActivities.filter((a: Activity) => a.category === 'workshop').length,
+      events: flatActivities.filter((a: Activity) => a.category === 'events').length,
+      'industrial-visit': flatActivities.filter((a: Activity) => a.category === 'industrial-visit').length,
+    };
+  }, []);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setInView(entry.isIntersecting),
@@ -72,28 +94,28 @@ export default function Activities() {
   return (
     <section
       id="activities"
-      className="py-24 bg-white px-6 dark:bg-pure-black"
+      className="py-16 md:py-20 lg:py-24 bg-white px-4 md:px-6 dark:bg-pure-black"
       ref={activitiesRef}
     >
       <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-4xl font-bold mb-12 dark:text-white">
+        <h2 className="text-3xl md:text-4xl font-bold mb-8 md:mb-10 lg:mb-12 dark:text-white">
           {activitiesContent.title}
         </h2>
-        <div className="grid md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10 sm:place-items-center lg:place-items-stretch">
           {activitiesContent.cards.map((card, idx) => {
-            const count = useCounter(card.count, inView);
+            const count = useCounter(activityCounts[card.category], inView);
             return (
               <div
                 key={idx}
-                className="p-8 bg-gray-50 shadow-lg rounded-2xl hover:shadow-xl transition dark:bg-gray-800 dark:shadow-gray-700/20"
+                className="w-full max-w-md sm:max-w-none p-6 md:p-8 bg-gray-50 shadow-lg rounded-2xl hover:shadow-xl transition-shadow duration-300 dark:bg-gray-800 dark:shadow-gray-700/20"
               >
-                <h3 className="text-2xl font-semibold mb-2 dark:text-white">
+                <h3 className="text-xl md:text-2xl font-semibold mb-2 dark:text-white">
                   {card.heading}
                 </h3>
-                <p className="text-4xl font-bold text-green-600 mb-4 dark:text-green-400">
+                <p className="text-3xl md:text-4xl font-bold text-green-600 mb-3 md:mb-4 dark:text-green-400">
                   {count}
                 </p>
-                <p className="text-gray-600 dark:text-gray-300">{card.text}</p>
+                <p className="text-sm md:text-base text-gray-600 dark:text-gray-300">{card.text}</p>
               </div>
             );
           })}

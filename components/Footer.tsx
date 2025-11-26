@@ -99,6 +99,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="text-center text-xs sm:text-sm text-gray-500 mt-8 sm:mt-12 border-t border-gray-700 pt-4 sm:pt-6 dark:text-gray-400 dark:border-gray-600">
           © {currentYear} AATCC Student Chapter — All Rights Reserved
+          {/* <br></br>@ Developed by <a href="https://www.facebook.com/suhail.mujtabir/">Md. Suhail Mujtabir</a> */}
         </div>
       </div>
     </footer>

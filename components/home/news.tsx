@@ -33,7 +33,7 @@ const newsData = [
     for Textile Focus’s Public Speaking Session — INSPIRATION! 🌟 Their collaboration highlights a shared commitment to empowering voices, 
     fostering dialogue, and inspiring the textile community. Stay tuned for event highlights and stories that motivate, 
     connect, and spark creativity! `,
-    img: 'https://scontent.fdac207-1.fna.fbcdn.net/v/t39.30808-6/571222072_1134214192256402_638576921406282213_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=aa7b47&_nc_eui2=AeH9iMvC5wmMJWCERNZCOkaAwaJBAm5Th8vBokECblOHy_QIaG_-lbCC0al9ckYw0T4TdzA7_SKz8QIXRY3edveW&_nc_ohc=GoBxHWYJPVcQ7kNvwFdQ6iV&_nc_oc=AdkX3O8Nkgv12d38cqfDUASbu9Qq6Av0nSk0uts7itvxjKHBDe8mhsqBgJT7MFQQbl0&_nc_zt=23&_nc_ht=scontent.fdac207-1.fna&_nc_gid=3uDBU9sPYo9GK_590D8YwQ&oh=00_AfizBSQMfOLjzvowSmW_7YVJGZv2Rp7iV2eSGQyKyns8gA&oe=691AAFDE',
+    img: 'https://imglink.io/i/9ebcdda2-42a5-49f6-851d-f4531e46dcd8.jpg',
     link: 'https://www.facebook.com/photo/?fbid=1134215405589614&set=gm.3301847689983890&idorvanity=3272361916265801'
   },
 ];

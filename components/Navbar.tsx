@@ -12,11 +12,11 @@ const NAV_ITEMS = [
   {
     id: "activities",
     label: "Activities",
-    page: "/overview",
+    page: "/activities",
     children: [
-      { id: "events", label: "Events", page: "/overview#events" },
-      { id: "workshops", label: "Workshops", page: "/overview#workshops" },
-      { id: "industrial-visit", label: "Industrial Visit", page: "/overview#industrial-visit" },
+      { id: "events", label: "Events", page: "/activities?category=events" },
+      { id: "workshops", label: "Workshops", page: "/activities?category=workshop" },
+      { id: "industrial-visit", label: "Industrial Visit", page: "/activities?category=industrial-visit" },
     ],
   },
   { id: "hof", label: "Hall of Fame", page: "/hof" },

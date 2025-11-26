@@ -320,22 +320,22 @@ body {
 .pause-animation:hover {
   animation-play-state: paused !important;
 }
-/* Infinite Scroll Animations */
+/* Infinite Scroll Animations with hardware acceleration */
 @keyframes scroll-left {
   0% {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
 @keyframes scroll-right {
   0% {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
   100% {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
@@ -343,7 +343,14 @@ body {
   animation-play-state: paused !important;
 }
 
-/* Ensure smooth scrolling */
+/* Ensure smooth scrolling with hardware acceleration */
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .line-clamp-5 {
   display: -webkit-box;
   -webkit-line-clamp: 5;
