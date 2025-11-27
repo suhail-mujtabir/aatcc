@@ -10,10 +10,10 @@ import newsData from '@/data/news.json';
 
 interface NewsItem {
   id: number;
+  slug: string;
   title: string;
   excerpt: string;
   image: string;
-  link: string;
   date: string;
 }
 
@@ -24,7 +24,7 @@ export default function NewsCarousel() {
 
   const autoplayPlugin = Autoplay({
     delay: 4000,
-    stopOnInteraction: true,
+    stopOnInteraction: false,
     stopOnMouseEnter: true,
   });
 
@@ -32,6 +32,7 @@ export default function NewsCarousel() {
     { 
       loop: true,
       skipSnaps: false,
+      align: 'start',
     },
     [autoplayPlugin]
   );
@@ -67,9 +68,10 @@ export default function NewsCarousel() {
     setAnimationKey(1);
   }, []);
 
-  const featuredNews: NewsItem[] = newsData.featuredNews;
+  // Filter to show only featured news
+  const newsItems: NewsItem[] = newsData.news.filter(item => item.featured === true);
 
-  if (!featuredNews || featuredNews.length === 0) {
+  if (!newsItems || newsItems.length === 0) {
     return null;
   }
 
@@ -84,7 +86,7 @@ export default function NewsCarousel() {
         {/* Carousel Container */}
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
-            {featuredNews.map((newsItem, index) => (
+            {newsItems.map((newsItem, index) => (
               <div
                 key={newsItem.id}
                 className="flex-[0_0_100%] min-w-0 px-2 sm:px-4"
@@ -135,9 +137,7 @@ export default function NewsCarousel() {
                     {/* Read More Button */}
                     <div className="pt-2">
                       <a
-                        href={newsItem.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href={`/news/${newsItem.slug}`}
                         className="inline-flex items-center gap-2 px-6 py-2.5 sm:px-7 sm:py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95 touch-manipulation"
                         style={{ minHeight: '44px', minWidth: '44px' }}
                       >
@@ -154,7 +154,7 @@ export default function NewsCarousel() {
 
         {/* Dot Indicators */}
         <div className="flex justify-center items-center gap-2 mt-6 sm:mt-8" role="tablist" aria-label="News carousel navigation">
-          {featuredNews.map((_, index) => (
+          {newsItems.map((_, index) => (
             <button
               key={index}
               onClick={() => scrollTo(index)}

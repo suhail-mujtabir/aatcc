@@ -7,8 +7,8 @@ import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import { ThemeProvider } from '@/context/ThemeContext';
 import SnowEffect from '@/components/SnowEffect';
-import ClickSpark from "@/components/clickSpark";
 import {ReactLenis} from '@/components/utils/lenis';
+import ConditionalClickSpark from "@/components/ConditionalClickSpark";
 
 // Viewport configuration (includes theme color)
 export const viewport: Viewport = {
@@ -181,7 +181,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <SnowEffect snowflakeCount={70}/>
-            <ClickSpark
+            <ConditionalClickSpark
               sparkSize={10}
               sparkRadius={15}
               sparkCount={8}
@@ -195,7 +195,7 @@ export default function RootLayout({
               </ReactLenis>
               <Footer/>
               <ScrollToTop />
-            </ClickSpark>
+            </ConditionalClickSpark>
           </AuthProvider>
         </ThemeProvider>
       </body>

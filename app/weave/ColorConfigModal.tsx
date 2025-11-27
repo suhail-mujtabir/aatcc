@@ -43,7 +43,7 @@ export default function ColorConfigModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className={`rounded-xl border shadow-2xl max-w-md w-full ${
+      <div className={`rounded-xl border shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto ${
         isDark 
           ? 'bg-slate-900 border-slate-700' 
           : 'bg-white border-gray-200'

@@ -5,14 +5,16 @@ import CardSwap, { Card } from '../CardSwap';
 import TextReveal, { TextFadeIn } from '../Textreveal';
 import newsDataImport from '@/data/news.json';
 
-// Transform JSON data to match component's expected format
-const newsData = newsDataImport.featuredNews.map(item => ({
-  id: item.id,
-  title: item.title,
-  content: item.excerpt,
-  img: item.image,
-  link: item.link
-}));
+// Transform JSON data to match component's expected format - only featured news
+const newsData = newsDataImport.news
+  .filter(item => item.featured === true)
+  .map(item => ({
+    id: item.id,
+    title: item.title,
+    content: item.excerpt,
+    img: item.image,
+    link: `/news/${item.slug}`
+  }));
 
 export default function News() {
   const [currentCardId, setCurrentCardId] = useState(newsData[0].id);
@@ -90,8 +92,6 @@ export default function News() {
             {/* Read More Link */}
             <a
               href={currentNews.link}
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-block mt-4 px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-lg hover:opacity-80 transition-opacity"
             >
               Read Full Article →
@@ -116,8 +116,6 @@ export default function News() {
                   >
                     <a
                       href={item.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className="block h-full cursor-pointer"
                     >
                       <div 

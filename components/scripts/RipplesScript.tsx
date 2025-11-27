@@ -16,6 +16,9 @@ export default function RipplesScript() {
   useEffect(() => {
     // Re-initialize ripples on every route change
     const reinitRipples = () => {
+      // Only initialize on large screens (1024px and above)
+      if (window.innerWidth < 1024) return;
+      
       if (window.$ && window.$.fn.ripples) {
         try {
           // Simple re-initialization without destroy
@@ -37,7 +40,9 @@ export default function RipplesScript() {
   }, [pathname]);
 
   useEffect(() => {
-    // Initial load
+    // Initial load - only on large screens
+    if (window.innerWidth < 1024) return;
+    
     const loadRipples = () => {
       if (window.$ && !window.$.fn.ripples) {
         const script = document.createElement('script');

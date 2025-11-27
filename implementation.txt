@@ -1,0 +1,1022 @@
+TASK: Create a complete news system with listing page (/news) and individual article pages (/news/[slug]) using JSON metadata + Markdown content approach.
+
+PROJECT OVERVIEW:
+Build a full-featured news section where:
+- News metadata stored in /data/news.json
+- Full article content stored as Markdown in /content/news/
+- Main listing page at /news with grid layout and infinite scroll
+- Individual article pages at /news/[slug] with rich content and SEO
+- Mobile responsive throughout
+- Auto-generate slugs from titles
+- Dynamic SEO metadata with Open Graph and structured data
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART 1: DATA STRUCTURE & SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. RESTRUCTURE /data/news.json:
+
+Replace existing featuredNews structure with:
+```json
+{
+  "news": [
+    {
+      "id": 1,
+      "slug": "texposium-10-showcasing-student-innovation",
+      "title": "Texposium 1.0: Showcasing Student Innovation in Textiles",
+      "excerpt": "The AATCC AUST Student Chapter hosted Texposium 1.0, a vibrant poster presentation where ten teams shared creative ideas on textile science, sustainability, and design. Supported by Techno Colour Craft Ltd. and MTM Intending, the event celebrated innovation, teamwork, and the bright future of Bangladesh's textile industry.",
+      "image": "https://textiletoday.com.bd/storage/uploads/2025/9/2679LlokWwl6o7DTDjc2.png",
+      "date": "2025-01-15",
+      "author": "AATCC Team",
+      "tags": ["Events", "Innovation", "Textiles"],
+      "readTime": "3 min",
+      "featured": true,
+      "contentFile": "texposium-10-showcase.md"
+    },
+    {
+      "id": 2,
+      "slug": "texposium-brilliance-stage",
+      "title": "Texposium 1.0: A stage where textile meets Brilliance",
+      "excerpt": "The AATCC AUST Student Chapter hosted TexPosium 1.0, a vibrant poster presentation showcasing student creativity and research in textiles. Ten teams presented innovative ideas on sustainability, design, and textile science, with top performers receiving BDT 3,000 in prizes.",
+      "image": "https://textilefocus.com/wp-content/uploads/2025/09/f1c7e447-1895-4587-83b3-e67c93c74923.jpg",
+      "date": "2025-01-14",
+      "author": "AATCC Team",
+      "tags": ["Events", "Competition", "Textiles"],
+      "readTime": "4 min",
+      "featured": false,
+      "contentFile": "texposium-brilliance-stage.md"
+    },
+    {
+      "id": 3,
+      "slug": "textile-focus-partnership-inspiration",
+      "title": "AATCC AUST Partners with Textile Focus for INSPIRATION",
+      "excerpt": "We're excited to announce our Club Partner, the AATCC–AUST Student Chapter, for Textile Focus's Public Speaking Session — INSPIRATION! Their collaboration highlights a shared commitment to empowering voices, fostering dialogue, and inspiring the textile community.",
+      "image": "https://imglink.io/i/9ebcdda2-42a5-49f6-851d-f4531e46dcd8.jpg",
+      "date": "2025-01-10",
+      "author": "AATCC Team",
+      "tags": ["Partnership", "Events", "Public Speaking"],
+      "readTime": "2 min",
+      "featured": false,
+      "contentFile": "textile-focus-partnership.md"
+    }
+  ]
+}
+```
+
+Note: Keep existing structure but rename "featuredNews" to "news" and add new fields.
+
+2. CREATE MARKDOWN FILES IN /content/news/:
+
+Create these three markdown files with full article content:
+
+File: content/news/texposium-10-showcase.md
+```markdown
+---
+slug: texposium-10-showcasing-student-innovation
+title: Texposium 1.0: Showcasing Student Innovation in Textiles
+---
+
+The AATCC AUST Student Chapter hosted **Texposium 1.0**, a vibrant poster presentation that brought together creativity, innovation, and textile science under one roof. This groundbreaking event showcased the brilliance of ten student teams who presented their innovative ideas on sustainability, design, and textile technology.
+
+## Event Highlights
+
+The event was a testament to the growing enthusiasm among students for textile research and innovation. Key highlights included:
+
+- **10 Creative Teams**: Each team presented unique research projects focusing on various aspects of textile science
+- **Industry Support**: The event was proudly supported by Techno Colour Craft Ltd. and MTM Intending
+- **Focus Areas**: Sustainability, innovative design, textile technology, and industry applications
+- **Interactive Sessions**: Engaging discussions between students, faculty, and industry professionals
+
+## Innovative Ideas Presented
+
+Teams presented groundbreaking concepts including:
+
+1. Sustainable textile manufacturing processes
+2. Smart textiles and wearable technology
+3. Eco-friendly dyeing techniques
+4. Innovative fiber development
+5. Textile waste recycling solutions
+
+## Impact and Success
+
+Texposium 1.0 was more than just a presentation event—it was a platform for:
+
+- **Knowledge Exchange**: Students learned from industry experts and each other
+- **Networking**: Connections were forged between academia and industry
+- **Inspiration**: Young minds were inspired to pursue careers in textile innovation
+- **Recognition**: Outstanding projects received recognition and encouragement
+
+## Looking Forward
+
+The success of Texposium 1.0 marks the beginning of an exciting journey. The AATCC AUST Student Chapter is committed to organizing more such events that bridge the gap between academic learning and industry practice, fostering the next generation of textile innovators.
+
+The event celebrated not just individual achievements but the collective spirit of innovation, teamwork, and the bright future of Bangladesh's textile industry.
+```
+
+File: content/news/texposium-brilliance-stage.md
+```markdown
+---
+slug: texposium-brilliance-stage
+title: Texposium 1.0: A stage where textile meets Brilliance
+---
+
+In a remarkable showcase of talent and innovation, the AATCC AUST Student Chapter organized **TexPosium 1.0**, a vibrant poster presentation that illuminated the potential of student-driven research in the textile sector.
+
+## Competition Format
+
+The event featured a competitive format that encouraged excellence:
+
+- **10 Participating Teams**: Each bringing unique perspectives on textile innovation
+- **Prize Pool**: BDT 3,000 for top performers
+- **Evaluation Criteria**: Innovation, presentation quality, practical applicability, and research depth
+- **Expert Judges**: Industry professionals and academic experts
+
+## Research Areas Explored
+
+Teams delved into diverse and exciting areas of textile research:
+
+### Sustainability Focus
+Students presented innovative solutions for sustainable textile production, including eco-friendly materials, water conservation techniques, and circular economy models.
+
+### Design Innovation
+Creative design concepts that merged traditional textile crafts with modern technology, showcasing the future of textile aesthetics.
+
+### Textile Science
+Deep scientific research into fiber properties, fabric engineering, and performance textiles for specialized applications.
+
+## Student Testimonials
+
+Participants expressed overwhelming enthusiasm:
+
+> "Texposium gave us a platform to showcase our research and receive valuable feedback from industry experts. It was an incredible learning experience." - Team Leader, Sustainable Textiles Project
+
+> "The competition pushed us to think beyond textbooks and explore real-world applications of our ideas." - Participant, Smart Textiles Team
+
+## Industry Engagement
+
+The event successfully brought together:
+
+- **Academic Excellence**: Demonstrating the quality of education at AUST
+- **Industry Relevance**: Addressing real challenges faced by the textile sector
+- **Innovation Culture**: Fostering a mindset of continuous improvement and creativity
+- **Professional Networking**: Creating connections that benefit students' future careers
+
+## Event Outcomes
+
+Texposium 1.0 achieved significant milestones:
+
+1. Enhanced student confidence in presenting technical work
+2. Identified promising research directions for future exploration
+3. Strengthened industry-academia collaboration
+4. Inspired more students to engage in textile research
+
+## Acknowledgments
+
+The success of Texposium 1.0 was made possible through the support of sponsors, faculty advisors, and the dedicated organizing committee. Their commitment to student development and innovation made this event a resounding success.
+
+The event stands as proof that when passion meets opportunity, brilliance emerges—and the future of Bangladesh's textile industry is indeed bright.
+```
+
+File: content/news/textile-focus-partnership.md
+```markdown
+---
+slug: textile-focus-partnership-inspiration
+title: AATCC AUST Partners with Textile Focus for INSPIRATION
+---
+
+We are thrilled to announce an exciting partnership between the **AATCC AUST Student Chapter** and **Textile Focus** for the upcoming Public Speaking Session—**INSPIRATION**!
+
+## About the Partnership
+
+This collaboration represents a significant milestone in our mission to empower students and professionals in the textile industry. By joining forces with Textile Focus, one of the leading platforms for textile industry news and knowledge sharing, we're creating opportunities for our community to:
+
+- Develop public speaking and communication skills
+- Share innovative ideas and experiences
+- Connect with industry leaders and professionals
+- Inspire and be inspired by textile industry stories
+
+## INSPIRATION: Public Speaking Session
+
+The INSPIRATION public speaking session is designed to:
+
+### Empower Voices
+Providing a platform for students and young professionals to share their stories, ideas, and perspectives on the textile industry.
+
+### Foster Dialogue
+Creating meaningful conversations about challenges, opportunities, and innovations in the textile sector.
+
+### Build Confidence
+Helping participants develop the public speaking skills essential for professional success.
+
+### Inspire Innovation
+Sharing stories that motivate others to think creatively and pursue excellence in their textile careers.
+
+## What to Expect
+
+Participants and attendees can look forward to:
+
+- **Engaging Presentations**: Speakers sharing personal journeys, industry insights, and innovative ideas
+- **Interactive Sessions**: Q&A opportunities and discussions with speakers
+- **Networking**: Connecting with peers, industry professionals, and potential mentors
+- **Learning Opportunities**: Gaining insights into various aspects of the textile industry
+- **Professional Development**: Tips and techniques for effective public speaking
+
+## Our Commitment
+
+This partnership embodies the AATCC AUST Student Chapter's core values:
+
+1. **Empowerment**: Giving students a voice and platform
+2. **Education**: Continuous learning and skill development
+3. **Innovation**: Encouraging creative thinking and new ideas
+4. **Community**: Building strong connections within the textile industry
+5. **Excellence**: Striving for the highest standards in everything we do
+
+## Join Us
+
+We invite all textile enthusiasts, students, professionals, and industry stakeholders to be part of this exciting initiative. Whether you're interested in speaking, attending, or supporting, there's a place for you in the INSPIRATION community.
+
+## Looking Ahead
+
+This partnership with Textile Focus is just the beginning. We're committed to creating more such opportunities that bridge the gap between students and industry, fostering a vibrant community of textile professionals who are passionate about innovation, sustainability, and excellence.
+
+Stay tuned for event updates, speaker announcements, and registration details. Together, we'll create moments that inspire, conversations that matter, and connections that last.
+
+**Let's inspire the future of textiles—together!**
+```
+
+3. CREATE UTILITY FILE /lib/news.ts:
+```typescript
+import fs from 'fs';
+import path from 'path';
+import matter from 'gray-matter';
+import { remark } from 'remark';
+import html from 'remark-html';
+import newsData from '@/data/news.json';
+
+export interface NewsArticle {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  date: string;
+  author: string;
+  tags: string[];
+  readTime: string;
+  featured: boolean;
+  contentFile: string;
+  contentHtml?: string;
+}
+
+// Generate slug from title
+export function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-')      // Replace spaces with hyphens
+    .replace(/-+/g, '-')       // Replace multiple hyphens with single
+    .trim();
+}
+
+// Get all news articles
+export function getAllNews(): NewsArticle[] {
+  return newsData.news.sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+}
+
+// Get single news article by slug
+export async function getNewsBySlug(slug: string): Promise<NewsArticle | null> {
+  const article = newsData.news.find(item => item.slug === slug);
+  
+  if (!article) return null;
+  
+  // Read markdown file
+  const markdownPath = path.join(process.cwd(), 'content/news', article.contentFile);
+  const fileContents = fs.readFileSync(markdownPath, 'utf8');
+  const { content } = matter(fileContents);
+  
+  // Convert markdown to HTML
+  const processedContent = await remark()
+    .use(html)
+    .process(content);
+  
+  return {
+    ...article,
+    contentHtml: processedContent.toString()
+  };
+}
+
+// Get related news (by tags)
+export function getRelatedNews(currentSlug: string, tags: string[], limit: number = 3): NewsArticle[] {
+  return newsData.news
+    .filter(article => 
+      article.slug !== currentSlug && 
+      article.tags.some(tag => tags.includes(tag))
+    )
+    .slice(0, limit);
+}
+
+// Get featured news
+export function getFeaturedNews(): NewsArticle[] {
+  return newsData.news.filter(article => article.featured);
+}
+```
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART 2: NEWS LISTING PAGE (/news)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create: app/news/page.tsx
+```typescript
+import { Metadata } from 'next';
+import NewsListing from '@/components/news/NewsListing';
+import { getAllNews } from '@/lib/news';
+
+export const metadata: Metadata = {
+  title: 'Latest News | AATCC AUST Student Chapter',
+  description: 'Stay updated with the latest news, events, and achievements from AATCC AUST Student Chapter. Read about our workshops, competitions, partnerships, and industry collaborations.',
+  openGraph: {
+    title: 'Latest News | AATCC AUST Student Chapter',
+    description: 'Stay updated with AATCC AUST activities, events, and achievements.',
+    type: 'website',
+  },
+};
+
+export default function NewsPage() {
+  const allNews = getAllNews();
+  
+  return (
+    <main className="min-h-screen py-20 px-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+            Latest News
+          </h1>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            Stay updated with AATCC AUST activities, events, and achievements
+          </p>
+        </div>
+        
+        {/* News Grid with Infinite Scroll */}
+        <NewsListing initialNews={allNews} />
+      </div>
+    </main>
+  );
+}
+```
+
+Create: components/news/NewsListing.tsx (Client Component)
+```typescript
+'use client';
+
+import { useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import NewsCard from './NewsCard';
+import { NewsArticle } from '@/lib/news';
+
+interface NewsListingProps {
+  initialNews: NewsArticle[];
+}
+
+export default function NewsListing({ initialNews }: NewsListingProps) {
+  const [displayedNews, setDisplayedNews] = useState<NewsArticle[]>(
+    initialNews.slice(0, 9) // Initial load: 9 items
+  );
+  const [hasMore, setHasMore] = useState(initialNews.length > 9);
+
+  const loadMore = () => {
+    const currentLength = displayedNews.length;
+    const nextNews = initialNews.slice(currentLength, currentLength + 6);
+    
+    if (nextNews.length === 0) {
+      setHasMore(false);
+      return;
+    }
+    
+    setDisplayedNews([...displayedNews, ...nextNews]);
+    
+    if (currentLength + nextNews.length >= initialNews.length) {
+      setHasMore(false);
+    }
+  };
+
+  return (
+    <InfiniteScroll
+      dataLength={displayedNews.length}
+      next={loadMore}
+      hasMore={hasMore}
+      loader={
+        <div className="text-center py-8">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+        </div>
+      }
+      endMessage={
+        <p className="text-center text-gray-500 py-8">
+          You've reached the end of our news archive
+        </p>
+      }
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        {displayedNews.map((article, index) => (
+          <NewsCard key={article.id} article={article} index={index} />
+        ))}
+      </div>
+    </InfiniteScroll>
+  );
+}
+```
+
+Create: components/news/NewsCard.tsx
+```typescript
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Calendar, Clock } from 'lucide-react';
+import { NewsArticle } from '@/lib/news';
+
+interface NewsCardProps {
+  article: NewsArticle;
+  index: number;
+}
+
+export default function NewsCard({ article, index }: NewsCardProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+    >
+      <Link href={`/news/${article.slug}`}>
+        <div className="group bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800 hover:border-blue-500 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1">
+          {/* Image */}
+          <div className="relative aspect-video overflow-hidden bg-gray-800">
+            <Image
+              src={article.image}
+              alt={article.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+          
+          {/* Content */}
+          <div className="p-6">
+            {/* Title */}
+            <h3 className="text-xl font-semibold mb-3 line-clamp-2 group-hover:text-blue-400 transition-colors">
+              {article.title}
+            </h3>
+            
+            {/* Excerpt */}
+            <p className="text-gray-400 text-sm mb-4 line-clamp-3">
+              {article.excerpt}
+            </p>
+            
+            {/* Meta Info */}
+            <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
+              <div className="flex items-center gap-1">
+                <Calendar className="w-4 h-4" />
+                <span>{new Date(article.date).toLocaleDateString('en-US', { 
+                  month: 'short', 
+                  day: 'numeric', 
+                  year: 'numeric' 
+                })}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                <span>{article.readTime}</span>
+              </div>
+            </div>
+            
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2">
+              {article.tags.slice(0, 3).map(tag => (
+                <span
+                  key={tag}
+                  className="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-xs"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+}
+```
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART 3: INDIVIDUAL ARTICLE PAGE (/news/[slug])
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create: app/news/[slug]/page.tsx
+```typescript
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Calendar, Clock, User, ArrowLeft, ChevronRight } from 'lucide-react';
+import { getNewsBySlug, getAllNews, getRelatedNews } from '@/lib/news';
+import ShareButtons from '@/components/news/ShareButtons';
+import RelatedNews from '@/components/news/RelatedNews';
+
+interface PageProps {
+  params: { slug: string };
+}
+
+// Generate static paths
+export async function generateStaticParams() {
+  const allNews = getAllNews();
+  return allNews.map(article => ({
+    slug: article.slug,
+  }));
+}
+
+// Generate metadata
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const article = await getNewsBySlug(params.slug);
+  
+  if (!article) {
+    return {
+      title: 'Article Not Found',
+    };
+  }
+  
+  return {
+    title: `${article.title} | AATCC AUST News`,
+    description: article.excerpt,
+    openGraph: {
+      title: article.title,
+      description: article.excerpt,
+      images: [article.image],
+      type: 'article',
+      publishedTime: article.date,
+      authors: [article.author],
+      tags: article.tags,
+    },
+  };
+}
+
+export default async function NewsArticlePage({ params }: PageProps) {
+  const article = await getNewsBySlug(params.slug);
+  
+  if (!article) {
+    notFound();
+  }
+  
+  const relatedNews = getRelatedNews(article.slug, article.tags);
+  
+  // Structured data
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": article.title,
+    "image": article.image,
+    "datePublished": article.date,
+    "author": {
+      "@type": "Organization",
+      "name": article.author
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AATCC AUST Student Chapter",
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${process.env.NEXT_PUBLIC_SITE_URL}/logo.png`
+      }
+    },
+    "description": article.excerpt,
+    "articleBody": article.excerpt
+  };
+  
+  return (
+    <>
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      
+      <article className="min-h-screen">
+        {/* Hero Image */}
+        <div className="relative w-full h-[50vh] md:h-[60vh] lg:h-[70vh]">
+          <Image
+            src={article.image}
+            alt={article.title}
+            fill
+            priority
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+        </div>
+        
+        {/* Content */}
+        <div className="max-w-4xl mx-auto px-6 -mt-32 relative z-10">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6">
+            <Link href="/" className="hover:text-blue-400 transition-colors">
+              Home
+            </Link>
+            <ChevronRight className="w-4 h-4" />
+            <Link href="/news" className="hover:text-blue-400 transition-colors">
+              News
+            </Link>
+            <ChevronRight className="w-4 h-4" />
+            <span className="text-gray-500">Article</span>
+          </nav>
+          
+          {/* Article Header */}
+          <div className="bg-gray-900/80 backdrop-blur-sm rounded-2xl p-8 md:p-12 mb-8">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+              {article.title}
+            </h1>
+            
+            {/* Meta Info */}
+            <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-gray-400 mb-6">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <span>
+                  {new Date(article.date).toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span>{article.readTime} read</span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                <span>{article.author}</span>
+              </div>
+            </div>
+            
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2">
+              {article.tags.map(tag => (
+                <span
+                  key={tag}
+                  className="px-4 py-2 bg-blue-500/10 text-blue-400 rounded-full text-sm border border-blue-500/20"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+          
+          {/* Article Content */}
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 md:p-12 mb-8">
+            <div 
+              className="prose prose-invert prose-lg max-w-none
+                prose-headings:font-bold prose-headings:text-white
+                prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6
+                prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-4
+                prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-6
+                prose-a:text-blue-400 prose-a:no-underline hover:prose-a:text-blue-300
+                prose-strong:text-white prose-strong:font-semibold
+                prose-ul:text-gray-300 prose-ul:my-6
+                prose-ol:text-gray-300 prose-ol:my-6
+                prose-li:my-2
+                prose-blockquote:border-l-4 prose-blockquote:border-blue-500 
+                prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-gray-400"
+              dangerouslySetInnerHTML={{ __html: article.contentHtml || '' }}
+            />
+          </div>
+          
+          {/* Share Section */}
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 mb-8">
+            <h3 className="text-xl font-semibold mb-4">Share this article</h3>
+            <ShareButtons 
+              url={`${process.env.NEXT_PUBLIC_SITE_URL}/news/${article.slug}`}
+              title={article.title}
+            />
+          </div>
+          
+          {/* Related News */}
+          {relatedNews.length > 0 && (
+            <div className="mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold mb-8">Related News</h2>
+              <RelatedNews articles={relatedNews} />
+            </div>
+          )}
+        </div>
+      </article>
+    </>
+  );
+}
+```
+
+Create: components/news/ShareButtons.tsx
+```typescript
+'use client';
+
+import { FacebookShareButton, LinkedinShareButton } from 'react-share';
+import { Facebook, Linkedin, Link as LinkIcon, Check } from 'lucide-react';
+import { useState } from 'react';
+
+interface ShareButtonsProps {
+  url: string;
+  title: string;
+}
+
+export default function ShareButtons({ url, title }: ShareButtonsProps) {
+  const [copied, setCopied] = useState(false);
+  
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+  
+  return (
+    <div className="flex flex-wrap gap-4">
+      {/* Facebook */}
+      <FacebookShareButton url={url} title={title}>
+        <div className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-full transition-colors cursor-pointer">
+          <Facebook className="w-5 h-5" />
+          <span>Facebook</span>
+        </div>
+      </FacebookShareButton>
+      
+      {/* LinkedIn */}
+      <LinkedinShareButton url={url} title={title}>
+        <div className="flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-full transition-colors cursor-pointer">
+          <Linkedin className="w-5 h-5" />
+          <span>LinkedIn</span>
+        </div>
+      </LinkedinShareButton>
+      
+      {/* Copy Link */}
+      <button
+        onClick={handleCopyLink}
+        className="flex items-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-full transition-colors"
+      >
+        {copied ? (
+          <>
+            <Check className="w-5 h-5" />
+            <span>Copied!</span>
+          </>
+        ) : (
+          <>
+            <LinkIcon className="w-5 h-5" />
+            <span>Copy Link</span>
+          </>
+        )}
+      </button>
+    </div>
+  );
+}
+```
+
+Create: components/news/RelatedNews.tsx
+```typescript
+import Link from 'next/link';
+import Image from 'next/image';
+import { NewsArticle } from '@/lib/news';
+import { Calendar, Clock } from 'lucide-react';
+
+interface RelatedNewsProps {
+articles: NewsArticle[]; }
+export default function RelatedNews({ articles }: RelatedNewsProps) { return ( <div className="grid grid-cols-1 md:grid-cols-3 gap-6"> {articles.map(article => ( <Link key={article.id} href={/news/${article.slug}}> <div className="group bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800 hover:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10"> <div className="relative aspect-video overflow-hidden bg-gray-800"> <Image src={article.image} alt={article.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" /> </div>
+<div className="p-4">
+          <h3 className="font-semibold mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">
+            {article.title}
+          </h3>
+          
+          <div className="flex items-center gap-3 text-xs text-gray-500">
+            <div className="flex items-center gap-1">
+              <Calendar className="w-3 h-3" />
+              <span>{new Date(article.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              <span>{article.readTime}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Link>
+  ))}
+</div>
+); }
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART 4: UPDATE EXISTING COMPONENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. UPDATE DESKTOP NEWS COMPONENT:
+
+Change from:
+```typescript
+const newsData = [...]
+```
+
+To:
+```typescript
+import newsData from '@/data/news.json';
+
+// Use newsData.news instead of newsData
+```
+
+2. UPDATE MOBILE NEWS CAROUSEL:
+
+Change from:
+```typescript
+import activitiesData from '@/data/activities.json';
+```
+
+To:
+```typescript
+import newsData from '@/data/news.json';
+
+// Use newsData.news
+```
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART 5: CONFIGURATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. UPDATE next.config.ts:
+
+Add image domains:
+```typescript
+images: {
+  remotePatterns: [
+    // Existing patterns...
+    {
+      protocol: 'https',
+      hostname: 'textiletoday.com.bd',
+    },
+    {
+      protocol: 'https',
+      hostname: 'textilefocus.com',
+    },
+    {
+      protocol: 'https',
+      hostname: 'imglink.io',
+    },
+  ],
+}
+```
+
+2. ADD ENVIRONMENT VARIABLE:
+
+In .env.local:
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+(Change to production URL when deploying)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART 6: INSTALL DEPENDENCIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Run these commands:
+```bash
+npm install gray-matter remark remark-html
+npm install react-infinite-scroll-component
+npm install react-share
+npm install @types/react-share --save-dev
+```
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TESTING CHECKLIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+After implementation, verify:
+
+/news page:
+- [ ] Grid layout displays correctly (3-2-1 columns)
+- [ ] All news cards show proper data
+- [ ] Infinite scroll loads more items
+- [ ] Cards have hover effects
+- [ ] Images load correctly
+- [ ] Responsive on all screen sizes
+- [ ] Links to individual articles work
+
+/news/[slug] page:
+- [ ] Hero image displays full width
+- [ ] Article content renders from markdown
+- [ ] Metadata displays correctly (date, author, read time, tags)
+- [ ] Share buttons work (Facebook, LinkedIn, Copy)
+- [ ] Related news shows correct articles
+- [ ] Breadcrumb navigation works
+- [ ] Typography looks good
+- [ ] Mobile responsive
+- [ ] SEO meta tags present
+- [ ] Open Graph tags correct
+- [ ] Structured data in HTML
+
+General:
+- [ ] No TypeScript errors
+- [ ] No console errors
+- [ ] Dark theme consistent
+- [ ] Smooth animations
+- [ ] Fast page loads
+- [ ] Images optimized
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+IMPORTANT NOTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Slugs are auto-generated from titles but stored in JSON for consistency
+2. Markdown files should match the contentFile value in JSON
+3. All external images require domains in next.config.ts
+4. Infinite scroll loads 9 items initially, then 6 more each time
+5. Related news shows max 3 articles with matching tags
+6. Share buttons require NEXT_PUBLIC_SITE_URL to be set
+7. Structured data improves SEO and search appearance
+8. Article pages are statically generated for better performance
+9. Dark theme and existing design language maintained throughout
+10. Mobile-first responsive design approach
+
+MIGRATION STRATEGY:
+
+1. Create all new files first
+2. Test with one article before creating all markdown files
+3. Update existing components last
+4. Verify all routes work before pushing to production
+
+Please implement this complete news system with all features, ensuring responsive design, proper SEO, and maintaining the existing dark theme aesthetic.
+(Change to production URL when deploying)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART 6: INSTALL DEPENDENCIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Run these commands:
+```bash
+npm install gray-matter remark remark-html
+npm install react-infinite-scroll-component
+npm install react-share
+npm install @types/react-share --save-dev
+```
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TESTING CHECKLIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+After implementation, verify:
+
+/news page:
+- [ ] Grid layout displays correctly (3-2-1 columns)
+- [ ] All news cards show proper data
+- [ ] Infinite scroll loads more items
+- [ ] Cards have hover effects
+- [ ] Images load correctly
+- [ ] Responsive on all screen sizes
+- [ ] Links to individual articles work
+
+/news/[slug] page:
+- [ ] Hero image displays full width
+- [ ] Article content renders from markdown
+- [ ] Metadata displays correctly (date, author, read time, tags)
+- [ ] Share buttons work (Facebook, LinkedIn, Copy)
+- [ ] Related news shows correct articles
+- [ ] Breadcrumb navigation works
+- [ ] Typography looks good
+- [ ] Mobile responsive
+- [ ] SEO meta tags present
+- [ ] Open Graph tags correct
+- [ ] Structured data in HTML
+
+General:
+- [ ] No TypeScript errors
+- [ ] No console errors
+- [ ] Dark theme consistent
+- [ ] Smooth animations
+- [ ] Fast page loads
+- [ ] Images optimized
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+IMPORTANT NOTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Slugs are auto-generated from titles but stored in JSON for consistency
+2. Markdown files should match the contentFile value in JSON
+3. All external images require domains in next.config.ts
+4. Infinite scroll loads 9 items initially, then 6 more each time
+5. Related news shows max 3 articles with matching tags
+6. Share buttons require NEXT_PUBLIC_SITE_URL to be set
+7. Structured data improves SEO and search appearance
+8. Article pages are statically generated for better performance
+9. Dark theme and existing design language maintained throughout
+10. Mobile-first responsive design approach
+
+MIGRATION STRATEGY:
+
+1. Create all new files first
+2. Test with one article before creating all markdown files
+3. Update existing components last
+4. Verify all routes work before pushing to production
+
+Please implement this complete news system with all features, ensuring responsive design, proper SEO, and maintaining the existing dark theme aesthetic.

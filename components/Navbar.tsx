@@ -309,7 +309,7 @@ export default function Navbar() {
 
       {/* Spacer for pages that don't have hero sections */}
       {!isHome && !isDashboard && !isAbout && (
-        <div className="h-[62px]" />
+        <div className="dark:bg-gray-950 h-[62px]" />
       )}
     </>
   );
