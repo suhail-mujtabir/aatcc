@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Snowflake, CloudSnow } from "lucide-react";
+import { Snowflake, SunSnow } from "lucide-react";
 import { useSnow } from "@/components/SnowEffect";
 
 export default function SnowToggle() {
@@ -41,7 +41,7 @@ export default function SnowToggle() {
             !showSnow ? "opacity-100" : "opacity-0"
           }`}
         >
-          <CloudSnow className="w-5 h-5" />
+          <SunSnow className="w-5 h-5" />
         </div>
       </div>
     </button>
