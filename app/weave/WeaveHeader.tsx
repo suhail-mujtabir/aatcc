@@ -107,7 +107,7 @@ export default function WeaveHeader({
             {/* Action Buttons */}
             <button
               onClick={onInvert}
-              className={`px-3 py-1.5 rounded text-sm transition-colors flex items-center gap-1.5 ${
+              className={`cursor-pointer px-3 py-1.5 rounded text-sm transition-colors flex items-center gap-1.5 ${
                 isDark 
                   ? 'bg-slate-800 hover:bg-slate-700 text-slate-200' 
                   : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
@@ -120,7 +120,7 @@ export default function WeaveHeader({
 
             <button
               onClick={onClear}
-              className={`px-3 py-1.5 rounded text-sm transition-colors flex items-center gap-1.5 ${
+              className={`cursor-pointer px-3 py-1.5 rounded text-sm transition-colors flex items-center gap-1.5 ${
                 isDark 
                   ? 'bg-red-900/30 hover:bg-red-900/50 text-red-300' 
                   : 'bg-red-50 hover:bg-red-100 text-red-600 border border-red-200'
@@ -133,7 +133,7 @@ export default function WeaveHeader({
 
             <button
               onClick={onReset}
-              className={`px-3 py-1.5 rounded text-sm transition-colors flex items-center gap-1.5 ${
+              className={`cursor-pointer px-3 py-1.5 rounded text-sm transition-colors flex items-center gap-1.5 ${
                 isDark 
                   ? 'hover:bg-slate-800 text-slate-300' 
                   : 'hover:bg-gray-100 text-gray-600'

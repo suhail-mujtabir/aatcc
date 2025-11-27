@@ -6,7 +6,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import { ThemeProvider } from '@/context/ThemeContext';
-import SnowEffect from '@/components/SnowEffect';
+import { SnowProvider } from '@/components/SnowEffect';
 import {ReactLenis} from '@/components/utils/lenis';
 import ConditionalClickSpark from "@/components/ConditionalClickSpark";
 
@@ -180,22 +180,23 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <AuthProvider>
-            <SnowEffect snowflakeCount={70}/>
-            <ConditionalClickSpark
-              sparkSize={10}
-              sparkRadius={15}
-              sparkCount={8}
-              duration={400}
-            >
-              <Navbar />
-              <ReactLenis root>
-                <main className="flex-grow">
-                  {children}
-                </main>
-              </ReactLenis>
-              <Footer/>
-              <ScrollToTop />
-            </ConditionalClickSpark>
+            <SnowProvider>
+              <ConditionalClickSpark
+                sparkSize={10}
+                sparkRadius={15}
+                sparkCount={8}
+                duration={400}
+              >
+                <Navbar />
+                <ReactLenis root>
+                  <main className="flex-grow">
+                    {children}
+                  </main>
+                </ReactLenis>
+                <Footer/>
+                <ScrollToTop />
+              </ConditionalClickSpark>
+            </SnowProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

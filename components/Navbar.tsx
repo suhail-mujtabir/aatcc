@@ -1,5 +1,6 @@
 "use client";
 import ThemeToggle from "./ThemeToggle";
+import SnowToggle from "./SnowToggle";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
   { id: "hof", label: "Hall of Fame", page: "/hof" },
   { id: "news", label: "News", page: "/news" },
   { id: "contact", label: "Contact", page: "/contact" },
+  {id: "weave", label:"Weave", page:"/weave"}
 ];
 
 export default function Navbar() {
@@ -147,6 +149,7 @@ export default function Navbar() {
                 </div>
               </li>
             ))}
+            <li><SnowToggle /></li>
             <li><ThemeToggle /></li>
           </ul>
 
@@ -277,7 +280,8 @@ export default function Navbar() {
                   
                   {/* Mobile Auth Buttons */}
                   <div className="pt-4 border-t border-gray-800/50">
-                    <div className="flex justify-center mb-4">
+                    <div className="flex justify-center gap-2 mb-4">
+                      <SnowToggle />
                       <ThemeToggle />
                     </div>
                     {loading ? (

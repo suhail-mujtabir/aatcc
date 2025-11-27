@@ -1,17 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { FaFacebook, FaLinkedin, FaPhoneAlt } from "react-icons/fa";
+import { FaFacebook, FaLinkedin, FaPhoneAlt, FaWhatsapp } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
 import GlareHover from "../../components/GlassHover";
 import { fall24 } from "@/fall24";
 
 interface Member {
-  Timestamp: string
+  Timestamp: string;
   Name: string;
   role: string;
   img: string;
   Email: string;
-  "Phone": string;
+  Phone: string;
+  facebook: string;
+  LinkedIn: string;
 }
 
 // 🔧 Converts JSON into usable structure for your component
@@ -21,11 +24,11 @@ const createHofContent = (data: Member[]) => {
     members: data.map((member) => ({
       name: member.Name.trim(),
       designation: member.role,
-      img: member.img, // convert drive link to direct image link
-      // facebook: member.fb || "#",
-      // linkedin: member.LinkedIn || "#",
-      // phone: member["Phone no."] || "#",
-      email: member.Email || "#",
+      img: member.img,
+      facebook: member.facebook || "",
+      linkedin: member.LinkedIn || "",
+      phone: member.Phone || "",
+      email: member.Email || "",
     })),
   };
 };
@@ -76,7 +79,7 @@ export default function Fall24() {
                   {member.designation}
                 </p>
                 <div className="flex justify-center space-x-4">
-                  {/* {member.facebook && (
+                  {member.facebook && (
                     <a
                       href={member.facebook}
                       className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
@@ -86,8 +89,8 @@ export default function Fall24() {
                     >
                       <FaFacebook size={20} />
                     </a>
-                  )} */}
-                  {/* {member.linkedin && (
+                  )}
+                  {member.linkedin && (
                     <a
                       href={member.linkedin}
                       className="text-blue-700 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-400"
@@ -97,16 +100,39 @@ export default function Fall24() {
                     >
                       <FaLinkedin size={20} />
                     </a>
-                  )} */}
-                  {/* {member.phone && (
+                  )}
+                  {member.email && (
+                    <a
+                      href={member.linkedin}
+                      className="text-blue-700 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-400"
+                      aria-label="email"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <MdEmail size={20} />
+                    </a>
+                  )}
+                  {member.phone && (
                     <a
                       href={`tel:${member.phone}`}
                       className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
                       aria-label="Phone"
+                      rel="noopener noreferrer"
                     >
                       <FaPhoneAlt size={20} />
                     </a>
-                  )} */}
+                  )}
+                  {member.phone && (
+                    <a
+                      href={`https://wa.me/${member.phone}`}
+                      className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
+                      aria-label="whatsapp"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <FaWhatsapp size={20} />
+                    </a>
+                  )}
                 </div>
               </div>
             </GlareHover>

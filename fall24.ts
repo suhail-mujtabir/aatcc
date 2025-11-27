@@ -6,7 +6,9 @@ export const fall24 = [
     "Name": "Md Israfil Hossain Rimon",
     "Phone": "01316353596",
     "role": "Chairperson",
-    "img": "/images/fall24/md-israfil-hossain-rimon.jpg"
+    "img": "/images/fall24/md-israfil-hossain-rimon.jpg",
+    "facebook": "",
+    "LinkedIn": ""
   },
   {
     "Timestamp": "8/31/2025 19:43:36",
@@ -14,7 +16,9 @@ export const fall24 = [
     "Name": "Mubtasim Fuad Arnob",
     "Phone": "01888106469",
     "role": "Vice Chairperson",
-    "img": "/images/fall24/mubtasim-fuad-arnob.jpg"
+    "img": "/images/fall24/mubtasim-fuad-arnob.jpg",
+    "facebook": "",
+    "LinkedIn": ""
   },
   {
     "Timestamp": "9/2/2025 1:15:38",
@@ -22,7 +26,9 @@ export const fall24 = [
     "Name": "Mohammad Sayeed Zubair",
     "Phone": "01799846976",
     "role": "Treasurer",
-    "img": "/images/fall24/mohammad-sayeed-zubair-.jpg"
+    "img": "/images/fall24/mohammad-sayeed-zubair-.jpg",
+    "facebook": "",
+    "LinkedIn": ""
   },
   {
     "Timestamp": "8/31/2025 19:52:40",
@@ -30,7 +36,9 @@ export const fall24 = [
     "Name": "Md. Suhail Mujtabir",
     "Phone": "01552454904",
     "role": "Secretary",
-    "img": "/images/fall24/md--suhail-mujtabir.jpg"
+    "img": "/images/fall24/md--suhail-mujtabir.jpg",
+    "facebook": "",
+    "LinkedIn": ""
   },
 
   // 📣 Event & PR
@@ -40,7 +48,9 @@ export const fall24 = [
     "Name": "MD TOHIDUL ISLAM SHAWON",
     "Phone": "1860711333",
     "role": "Event Management Coordinator",
-    "img": "/images/fall24/md-tohidul-islam-shawon-.jpg"
+    "img": "/images/fall24/md-tohidul-islam-shawon-.jpg",
+    "facebook": "",
+    "LinkedIn": ""
   },
   {
     "Timestamp": "8/30/2025 22:36:19",
@@ -48,7 +58,9 @@ export const fall24 = [
     "Name": "Fabiha Binte Mohsin",
     "Phone": "01624500833",
     "role": "Event Management Coordinator",
-    "img": "/images/fall24/fabiha-binte-mohsin.jpg"
+    "img": "/images/fall24/fabiha-binte-mohsin.jpg",
+    "facebook": "",
+    "LinkedIn": ""
   },
   {
     "Timestamp": "8/30/2025 14:49:37",
@@ -56,7 +68,9 @@ export const fall24 = [
     "Name": "Shah Shadman Islam",
     "Phone": "01317244240",
     "role": "Sponsor and PR Coordinator",
-    "img": "/images/fall24/shah-shadman-islam.jpg"
+    "img": "/images/fall24/shah-shadman-islam.jpg",
+    "facebook": "",
+    "LinkedIn": ""
   },
   {
     "Timestamp": "8/31/2025 0:37:09",
@@ -64,7 +78,9 @@ export const fall24 = [
     "Name": "Sanjana Jahan",
     "Phone": "01853633401",
     "role": "Sponsor and PR Coordinator",
-    "img": "/images/fall24/sanjana-jahan-.jpg"
+    "img": "/images/fall24/sanjana-jahan-.jpg",
+    "facebook": "",
+    "LinkedIn": ""
   },
 
   // 🎨 Media & Logistics
@@ -74,7 +90,9 @@ export const fall24 = [
     "Name": "Nafisa Nawar Mithi",
     "Phone": "01715040279",
     "role": "Social Media Coordinator",
-    "img": "/images/fall24/nafisa-nawar-mithi.jpg"
+    "img": "/images/fall24/nafisa-nawar-mithi.jpg",
+    "facebook": "",
+    "LinkedIn": ""
   },
   {
     "Timestamp": "8/31/2025 10:52:31",
@@ -82,7 +100,9 @@ export const fall24 = [
     "Name": "Md Rahim Ul Islam Chowdhury",
     "Phone": "01970558373",
     "role": "Visuals and Graphics Coordinator",
-    "img": "/images/fall24/md-rahim-ul-islam-chowdhury.jpg"
+    "img": "/images/fall24/md-rahim-ul-islam-chowdhury.jpg",
+    "facebook": "",
+    "LinkedIn": ""
   },
   {
     "Timestamp": "8/30/2025 14:41:15",
@@ -90,6 +110,8 @@ export const fall24 = [
     "Name": "Musabbir Hossain Mueen",
     "Phone": "+8801879045153",
     "role": "Logistic Coordinator",
-    "img": "/images/fall24/musabbir-hossain-mueen-.jpg"
+    "img": "/images/fall24/musabbir-hossain-mueen-.jpg",
+    "facebook": "",
+    "LinkedIn": ""
   }
 ];
