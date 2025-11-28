@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Snowflake, SunSnow } from "lucide-react";
 import { useSnow } from "@/components/SnowEffect";
 
-export default function SnowToggle() {
+function SnowToggleContent() {
   const { showSnow, setShowSnow } = useSnow();
   const [mounted, setMounted] = useState(false);
 
@@ -46,4 +46,21 @@ export default function SnowToggle() {
       </div>
     </button>
   );
+}
+
+export default function SnowToggle() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  // Don't render until mounted to ensure context is available
+  if (!mounted) {
+    return (
+      <button className="p-2 rounded-lg bg-transparent text-white w-9 h-9" aria-hidden>
+        <div className="w-5 h-5" />
+      </button>
+    );
+  }
+
+  return <SnowToggleContent />;
 }

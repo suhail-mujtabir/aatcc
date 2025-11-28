@@ -9,6 +9,8 @@ interface Snowflake {
   n: number;
 }
 
+const SNOW_STORAGE_KEY = 'snowfall-enabled';
+
 // Snow effect component
 const SnowEffect = ({ snowflakeCount = 100 }: { snowflakeCount?: number }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -148,7 +150,31 @@ interface SnowProviderProps {
 }
 
 export function SnowProvider({ children }: SnowProviderProps) {
-  const [showSnow, setShowSnow] = useState(true);
+  const [showSnow, setShowSnowState] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  // Initialize from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(SNOW_STORAGE_KEY);
+    if (stored !== null) {
+      setShowSnowState(stored === 'true');
+    } else {
+      // Default to true if no preference stored
+      setShowSnowState(true);
+      localStorage.setItem(SNOW_STORAGE_KEY, 'true');
+    }
+    setMounted(true);
+  }, []);
+
+  const setShowSnow = (show: boolean) => {
+    setShowSnowState(show);
+    localStorage.setItem(SNOW_STORAGE_KEY, String(show));
+  };
+
+  // Don't render until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return <>{children}</>;
+  }
 
   return (
     <SnowContext.Provider value={{ showSnow, setShowSnow }}>

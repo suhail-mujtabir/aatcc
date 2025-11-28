@@ -1,5 +1,5 @@
 "use client";
-
+import LogoMarquee from '@/components/LogoMarquee';
 import About from "@/components/home/about";
 import Activities from "@/components/home/activities";
 import Hero from "@/components/home/hero";
@@ -34,6 +34,7 @@ export default function Home() {
         <div className="block lg:hidden">
           <NewsCarousel />
         </div>
+      <LogoMarquee/>
       </div>
 
     </>

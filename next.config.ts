@@ -18,6 +18,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'imgur.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'textiletoday.com.bd',
         pathname: '/**',
       },
