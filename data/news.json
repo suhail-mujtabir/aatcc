@@ -114,7 +114,20 @@
   "tags": ["Recruitment", "AATCC", "Student Chapter", "AUST", "Textiles", "Community"],
   "readTime": "6 min",
   "featured": true,
-  "contentFile": "aatcc-aust-student-chapter-recruitment-2025-welcomes-new-members.html"
+  "contentFile": "aatcc-member-recruitment-spring2024.html"
+},
+{
+  "id": 1,
+  "slug": "aatcc-aust-student-chapter-founding-panel-unveiled",
+  "title": "AATCC AUST Student Chapter Founding Panel Unveiled with Vision for Textile Excellence",
+  "excerpt": "AATCC AUST Student Chapter proudly presents its founding panel, pioneering innovation and sustainability in textile education. Under Dr. Mohammad Tajul Islam's guidance, the chapter sets new benchmarks for excellence.",
+  "image": "https://i.imgur.com/0xlrz2R.jpeg",
+  "date": "2024-11-30",
+  "author": "AATCC Team",
+  "tags": ["AATCC", "AUST", "Student Chapter", "Textile Education", "Innovation", "Sustainability"],
+  "readTime": "5 min",
+  "featured": true,
+  "contentFile": "aatcc-founding-panel.html"
 }
   ]
 }
