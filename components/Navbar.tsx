@@ -99,6 +99,8 @@ export default function Navbar() {
               width={40}
               height={40}
               className="rounded-md transition-transform duration-300 group-hover:scale-105 w-8 h-8 sm:w-10 sm:h-10"
+              priority
+              quality={90}
             />
             <span className="hidden sm:inline text-lg font-bold tracking-wide hover:text-green-400 transition-colors duration-500 whitespace-nowrap">
               AATCC AUST Student Chapter

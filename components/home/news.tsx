@@ -1,6 +1,7 @@
 // components/home/news.tsx
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import CardSwap, { Card } from '../CardSwap';
 import TextReveal, { TextFadeIn } from '../Textreveal';
 import newsDataImport from '@/data/news.json';
@@ -137,10 +138,14 @@ export default function News() {
                         
                         {/* Image */}
                         <div className="flex-1 relative overflow-hidden">
-                          <img
+                          <Image
                             src={item.img}
                             alt={item.title}
-                            className="w-full h-full object-cover"
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            className="object-cover"
+                            loading="lazy"
+                            quality={75}
                           />
                         </div>
                       </div>

@@ -109,6 +109,8 @@ export default function NewsCarousel() {
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 600px, 700px"
                       onLoad={() => setImageLoaded(prev => ({ ...prev, [newsItem.id]: true }))}
                       priority={index === 0}
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      quality={75}
                     />
                   </div>
 

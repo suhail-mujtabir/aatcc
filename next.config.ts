@@ -37,6 +37,34 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    // Image optimization settings
+    formats: ['image/webp'], // Use WebP for better compression
+    minimumCacheTTL: 31536000, // Cache images for 1 year
+    deviceSizes: [640, 750, 828, 1080, 1200], // Reduced device sizes
+    imageSizes: [16, 32, 48, 64, 96, 128, 256], // Smaller image sizes
+  },
+  // Add cache headers for static assets
+  async headers() {
+    return [
+      {
+        source: '/images/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:all*(svg|jpg|jpeg|png|gif|ico|webp)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
   },
 };
 
