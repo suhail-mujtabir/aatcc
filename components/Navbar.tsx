@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
 
 const NAV_ITEMS = [
   { id: "about", label: "About", page: "/about" },
@@ -31,11 +30,9 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const pathname = usePathname();
-  const { user, loading } = useAuth();
 
   const isHome = pathname === "/";
   const isDashboard = pathname.startsWith("/dashboard");
-  const isLoginPage = pathname === "/login";
   const isAbout = pathname === "/about";
 
   // Pages that should have transparent navbar initially
@@ -76,10 +73,6 @@ export default function Navbar() {
   const toggleDropdown = (id: string) => {
     setActiveDropdown(activeDropdown === id ? null : id);
   };
-
-  if (isLoginPage) {
-    return null;
-  }
 
   return (
     <>
@@ -152,27 +145,6 @@ export default function Navbar() {
             <li><SnowToggle /></li>
             <li><ThemeToggle /></li>
           </ul>
-
-          {/* AUTH BUTTONS - Desktop */}
-          <div className="hidden lg:block pl-4 flex-shrink-0">
-            {loading ? (
-              <div className="h-9 w-24 bg-gray-700/50 rounded-lg"></div>
-            ) : user ? (
-              <Link
-                href="/dashboard"
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 text-sm"
-              >
-                Dashboard
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 text-sm"
-              >
-                Login
-              </Link>
-            )}
-          </div>
 
           {/* MOBILE MENU BUTTON */}
           <button
@@ -284,25 +256,6 @@ export default function Navbar() {
                       <SnowToggle />
                       <ThemeToggle />
                     </div>
-                    {loading ? (
-                      <div className="h-12 bg-gray-700/50 rounded-lg "></div>
-                    ) : user ? (
-                      <Link
-                        href="/dashboard"
-                        className="block w-full bg-green-600 hover:bg-green-700 text-white font-semibold text-center py-3 rounded-lg transition-colors duration-300"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Dashboard
-                      </Link>
-                    ) : (
-                      <Link
-                        href="/login"
-                        className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-center py-3 rounded-lg transition-colors duration-300"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Login
-                      </Link>
-                    )}
                   </div>
                 </div>
               </motion.div>
