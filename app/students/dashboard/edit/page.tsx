@@ -8,8 +8,7 @@ interface StudentProfile {
   id: string;
   student_id: string;
   name: string;
-  batch: string;
-  department: string;
+  bio: string;
 }
 
 export default function EditProfilePage() {
@@ -17,8 +16,7 @@ export default function EditProfilePage() {
   const [formData, setFormData] = useState({
     name: '',
     student_id: '',
-    batch: '',
-    department: ''
+    bio: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -45,8 +43,7 @@ export default function EditProfilePage() {
       setFormData({
         name: data.student.name,
         student_id: data.student.student_id,
-        batch: data.student.batch,
-        department: data.student.department
+        bio: data.student.bio || ''
       });
     } catch (err) {
       setError('Failed to load profile');
@@ -65,7 +62,10 @@ export default function EditProfilePage() {
       const res = await fetch('/api/student/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          name: formData.name,
+          bio: formData.bio
+        })
       });
 
       const data = await res.json();
@@ -146,39 +146,32 @@ export default function EditProfilePage() {
               <input
                 id="student_id"
                 type="text"
-                required
+                disabled
                 value={formData.student_id}
-                onChange={(e) => setFormData({ ...formData, student_id: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:text-white"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                title="Student ID cannot be changed"
               />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Student ID cannot be changed
+              </p>
             </div>
 
             <div>
-              <label htmlFor="batch" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Batch
+              <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Bio (Optional)
               </label>
-              <input
-                id="batch"
-                type="text"
-                required
-                value={formData.batch}
-                onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
+              <textarea
+                id="bio"
+                rows={4}
+                value={formData.bio}
+                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:text-white"
+                placeholder="Tell us about yourself..."
+                maxLength={500}
               />
-            </div>
-
-            <div>
-              <label htmlFor="department" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Department
-              </label>
-              <input
-                id="department"
-                type="text"
-                required
-                value={formData.department}
-                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:text-white"
-              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                {formData.bio.length}/500 characters
+              </p>
             </div>
 
             <div className="flex gap-3 pt-4">

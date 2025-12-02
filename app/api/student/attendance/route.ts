@@ -20,14 +20,14 @@ export async function GET(request: NextRequest) {
       .from('attendance')
       .select(`
         id,
-        check_in_time,
-        check_out_time,
+        checked_in_at,
+        checked_out_at,
         events (
           name
         )
       `)
       .eq('student_id', session.studentId)
-      .order('check_in_time', { ascending: false });
+      .order('checked_in_at', { ascending: false });
 
     if (error) {
       console.error('Attendance fetch error:', error);
@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
     const formattedAttendance = attendance?.map((record: any) => ({
       id: record.id,
       event_name: record.events?.name || 'Unknown Event',
-      check_in_time: record.check_in_time,
-      check_out_time: record.check_out_time
+      checked_in_at: record.checked_in_at,
+      checked_out_at: record.checked_out_at
     })) || [];
 
     return NextResponse.json({

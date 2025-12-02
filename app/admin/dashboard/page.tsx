@@ -72,10 +72,13 @@ export default function AdminDashboardPage() {
               </div>
             </Link>
 
-            {/* Placeholder for future features */}
-            <div className="p-6 bg-gray-100 dark:bg-gray-800/50 rounded-lg shadow opacity-50">
+            {/* Manage Events Card */}
+            <Link
+              href="/admin/events"
+              className="block p-6 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-shadow"
+            >
               <div className="flex items-center">
-                <div className="flex-shrink-0 bg-gray-400 rounded-md p-3">
+                <div className="flex-shrink-0 bg-green-500 rounded-md p-3">
                   <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -85,11 +88,33 @@ export default function AdminDashboardPage() {
                     Manage Events
                   </h2>
                   <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    Coming soon
+                    Create and manage events
                   </p>
                 </div>
               </div>
-            </div>
+            </Link>
+
+            {/* Import Registrations Card */}
+            <Link
+              href="/admin/import-registrations"
+              className="block p-6 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                  <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                  </svg>
+                </div>
+                <div className="ml-4">
+                  <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+                    Import Registrations
+                  </h2>
+                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    Upload registrations from Google Forms
+                  </p>
+                </div>
+              </div>
+            </Link>
 
             <div className="p-6 bg-gray-100 dark:bg-gray-800/50 rounded-lg shadow opacity-50">
               <div className="flex items-center">

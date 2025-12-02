@@ -162,8 +162,8 @@ app/
     {
       "id": "uuid",
       "event_name": "Weekly Meeting",
-      "check_in_time": "2024-01-15T14:00:00Z",
-      "check_out_time": "2024-01-15T16:00:00Z"
+      "checked_in_at": "2024-01-15T14:00:00Z",
+      "checked_out_at": "2024-01-15T16:00:00Z"
     }
   ]
 }

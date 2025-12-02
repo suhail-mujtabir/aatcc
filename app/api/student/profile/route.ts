@@ -6,22 +6,24 @@ export async function GET(request: NextRequest) {
   try {
     const session = await requireStudent();
 
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     // Fetch full student profile
     const supabase = createAdminClient();
     const { data: student, error } = await supabase
       .from('students')
-      .select('id, student_id, name, batch, department, created_at')
-      .eq('id', session.studentId)
+      .select('id, student_id, name, bio')
+      .eq('id', session.id)
       .single();
 
-    if (error || !student) {
+    if (error) {
+      console.error('Profile fetch error:', error);
+      console.error('Session ID:', session.id);
+      return NextResponse.json(
+        { error: 'Student not found' },
+        { status: 404 }
+      );
+    }
+
+    if (!student) {
       return NextResponse.json(
         { error: 'Student not found' },
         { status: 404 }
@@ -29,8 +31,14 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ student });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Profile fetch error:', error);
+    if (error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -42,54 +50,42 @@ export async function PATCH(request: NextRequest) {
   try {
     const session = await requireStudent();
 
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     const body = await request.json();
-    const { name, student_id, batch, department } = body;
+    const { name, bio } = body;
 
-    // Validate required fields
-    if (!name || !student_id || !batch || !department) {
+    // Validate required fields (student_id cannot be changed)
+    if (!name) {
       return NextResponse.json(
-        { error: 'All fields are required' },
+        { error: 'Name is required' },
         { status: 400 }
       );
     }
 
-    // Check if new student_id is already taken by another student
-    const supabase = createAdminClient();
-    
-    if (student_id !== session.id) {
-      const { data: existing } = await supabase
-        .from('students')
-        .select('id')
-        .eq('student_id', student_id)
-        .neq('id', session.studentId)
-        .single();
-
-      if (existing) {
-        return NextResponse.json(
-          { error: 'Student ID already exists' },
-          { status: 409 }
-        );
-      }
+    if (name.trim().length === 0 || name.length > 100) {
+      return NextResponse.json(
+        { error: 'Name must be 1-100 characters' },
+        { status: 400 }
+      );
     }
 
-    // Update student profile
+    if (bio && bio.length > 500) {
+      return NextResponse.json(
+        { error: 'Bio must be max 500 characters' },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createAdminClient();
+
+    // Update student profile (student_id is NOT updated)
     const { data: updated, error } = await supabase
       .from('students')
       .update({
-        name,
-        student_id,
-        batch,
-        department,
+        name: name.trim(),
+        bio: bio ? bio.trim() : '',
         updated_at: new Date().toISOString()
       })
-      .eq('id', session.studentId)
+      .eq('id', session.id)
       .select()
       .single();
 
@@ -105,8 +101,14 @@ export async function PATCH(request: NextRequest) {
       success: true,
       student: updated
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Profile update error:', error);
+    if (error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -3,6 +3,7 @@ import { createAdminClient } from './supabase';
 import bcrypt from 'bcryptjs';
 
 export interface AdminSession {
+  id: string; // UUID from database
   adminId: string;
   name: string;
 }
@@ -33,6 +34,7 @@ export async function loginAdmin(adminId: string, password: string): Promise<Adm
   }
 
   return {
+    id: admin.id,
     adminId: admin.admin_id,
     name: admin.name
   };
