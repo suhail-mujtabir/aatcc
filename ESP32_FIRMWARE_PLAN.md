@@ -17,8 +17,8 @@
 - [x] **GET /api/events/active** - Get current active event info (✅ DONE)
 - [x] **POST /api/cards/register** - Link card UID to student (✅ DONE)
 - [x] **app/admin/activate-cards/page.tsx** - Card activation UI page (✅ DONE)
-- [ ] **POST /api/cards/notify** - Real-time card detection for activation (OPTIONAL)
-- [ ] **GET /api/cards/status/[uid]** - Check card activation status (OPTIONAL)
+- [ ] **POST /api/cards/notify** - Real-time card detection for activation (OPTIONAL - not needed with polling)
+- [x] **GET /api/cards/status/[uid]** - Check card activation status (✅ DONE - ESP32 uses this)
 - [x] **lib/device-auth.ts** - Device authentication middleware (✅ DONE)
 
 #### Testing & Deployment
@@ -281,11 +281,11 @@ Body:
 
 ---
 
-### 1.6 GET /api/cards/status/[uid] (OPTIONAL)
+### 1.6 GET /api/cards/status/[uid]
 
 **File:** `app/api/cards/status/[uid]/route.ts`
 
-**Status:** ⏳ TO DO (OPTIONAL - for polling activation status)
+**Status:** ✅ DONE
 
 **Purpose:** ESP32 polls to check if card was activated by admin
 
