@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyDeviceAuth } from '@/lib/device-auth';
 import { createAdminClient } from '@/lib/supabase';
 
 /**
  * ESP32 reports detected card UID
  * POST /api/cards/detected
+ * 
+ * No authentication required for card detection
  * 
  * Request body:
  * {
@@ -21,12 +22,6 @@ import { createAdminClient } from '@/lib/supabase';
  */
 export async function POST(request: NextRequest) {
   try {
-    // Verify device authentication
-    const authError = verifyDeviceAuth(request);
-    if (authError) {
-      return authError;
-    }
-
     const body = await request.json();
     const { uid, deviceId } = body;
 
@@ -75,7 +70,11 @@ export async function POST(request: NextRequest) {
       });
 
     if (error) {
-      console.error('Insert pending card error:', error);
+      console.error('[Card Detection] Insert error:', {
+        uid: formattedUid,
+        deviceId,
+        error: error.message
+      });
       return NextResponse.json(
         { error: 'Failed to register card detection' },
         { status: 500 }
@@ -91,10 +90,14 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Card detection error:', error);
+    console.error('[Card Detection] Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
+
+// Use Edge runtime for better performance and lower cost
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';

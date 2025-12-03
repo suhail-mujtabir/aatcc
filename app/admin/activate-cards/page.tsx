@@ -27,8 +27,25 @@ export default function ActivateCardsPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [totalActivated, setTotalActivated] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const supabase = createClient();
+
+  // Check authentication on mount
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Current user:', user);
+    }
+    setIsAuthenticated(!!user);
+    if (!user) {
+      setError('Not logged in. Please log in as admin first.');
+    }
+  };
 
   // Fetch initial pending cards and setup realtime subscription
   useEffect(() => {
@@ -46,7 +63,9 @@ export default function ActivateCardsPage() {
           table: 'pending_cards'
         },
         (payload) => {
-          console.log('New card detected:', payload.new);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('New card detected:', payload.new);
+          }
           setPendingCards((prev) => [payload.new as PendingCard, ...prev]);
           // Audio notification (optional)
           playNotificationSound();
@@ -60,7 +79,9 @@ export default function ActivateCardsPage() {
           table: 'pending_cards'
         },
         (payload) => {
-          console.log('Card removed:', payload.old);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Card removed:', payload.old);
+          }
           setPendingCards((prev) => prev.filter((card) => card.uid !== (payload.old as PendingCard).uid));
         }
       )
@@ -113,6 +134,7 @@ export default function ActivateCardsPage() {
       const response = await fetch('/api/cards/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           studentId: studentId.trim(),
           cardUid: selectedCard

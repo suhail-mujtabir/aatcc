@@ -1,6 +1,5 @@
 import { createBrowserClient, createServerClient } from '@supabase/ssr'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
 
 /**
  * Create a Supabase client for use in browser components
@@ -38,6 +37,8 @@ export function createClient() {
  * ```
  */
 export async function createServerSupabaseClient() {
+  // Import cookies only when needed (server-side)
+  const { cookies } = await import('next/headers')
   const cookieStore = await cookies()
 
   return createServerClient(

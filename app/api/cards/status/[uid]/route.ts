@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase';
-import { verifyDeviceAuth } from '@/lib/device-auth';
 
 /**
  * GET /api/cards/status/[uid]
  * ESP32 device polls to check if card was activated by admin
  * 
- * Headers: X-Device-API-Key
+ * No authentication required (read-only, non-sensitive data)
  * 
  * Returns:
  * - { activated: true, studentName, studentId } if card is linked
@@ -14,18 +13,10 @@ import { verifyDeviceAuth } from '@/lib/device-auth';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { uid: string } }
+  { params }: { params: Promise<{ uid: string }> }
 ) {
-  // Verify device authentication
-  if (!verifyDeviceAuth(request)) {
-    return NextResponse.json(
-      { error: 'Unauthorized device' },
-      { status: 401 }
-    );
-  }
-
   try {
-    const cardUid = params.uid;
+    const { uid: cardUid } = await params;
 
     if (!cardUid) {
       return NextResponse.json(
@@ -44,7 +35,10 @@ export async function GET(
       .maybeSingle();
 
     if (studentError) {
-      console.error('Student lookup error:', studentError);
+      console.error('[Card Status] Lookup error:', {
+        uid: cardUid,
+        error: studentError.message
+      });
       return NextResponse.json(
         { error: 'Database error' },
         { status: 500 }
@@ -66,10 +60,14 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Card status error:', error);
+    console.error('[Card Status] Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
+
+// Use Edge runtime for better performance
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';

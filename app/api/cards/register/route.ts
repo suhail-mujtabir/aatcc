@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient, createServerSupabaseClient } from '@/lib/supabase';
+import { createAdminClient } from '@/lib/supabase';
+import { requireAdmin } from '@/lib/admin-auth';
 
 /**
  * Admin endpoint to activate a card (link to student)
@@ -21,30 +22,8 @@ import { createAdminClient, createServerSupabaseClient } from '@/lib/supabase';
  */
 export async function POST(request: NextRequest) {
   try {
-    // Verify admin authentication
-    const supabase = await createServerSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    // Verify user is admin
-    const { data: admin } = await supabase
-      .from('admins')
-      .select('id')
-      .eq('email', user.email)
-      .single();
-
-    if (!admin) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    // Verify admin authentication using cookie-based session
+    await requireAdmin();
 
     const body = await request.json();
     const { studentId, cardUid } = body;
@@ -104,7 +83,11 @@ export async function POST(request: NextRequest) {
       .eq('id', student.id);
 
     if (updateError) {
-      console.error('Update student error:', updateError);
+      console.error('[Card Register] Update error:', {
+        studentId,
+        cardUid: normalizedCardUid,
+        error: updateError.message
+      });
       return NextResponse.json(
         { error: 'Failed to activate card' },
         { status: 500 }
@@ -118,7 +101,10 @@ export async function POST(request: NextRequest) {
       .eq('uid', normalizedCardUid);
 
     if (deleteError) {
-      console.error('Delete pending card error:', deleteError);
+      console.error('[Card Register] Cleanup warning:', {
+        cardUid: normalizedCardUid,
+        error: deleteError.message
+      });
       // Non-critical error - card is activated, cleanup failed
     }
 
@@ -130,10 +116,13 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Card registration error:', error);
+    console.error('[Card Register] Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
+
+// Cannot use Edge runtime due to requireAdmin() using cookies()
+export const dynamic = 'force-dynamic';
