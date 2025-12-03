@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyDeviceAuth } from '@/lib/device-auth';
-import { createServerSupabaseClient } from '@/lib/supabase';
+import { createAdminClient } from '@/lib/supabase';
 
 /**
  * ESP32 reports detected card UID
@@ -8,29 +8,17 @@ import { createServerSupabaseClient } from '@/lib/supabase';
  * 
  * Request body:
  * {
- *   "cardUid": "AA:BB:CC:DD:EE:FF:00"
+ *   "uid": "AA:BB:CC:DD:EE:FF:00",
+ *   "deviceId": "esp32-001" (optional)
  * }
  * 
  * Response:
  * {
  *   "success": true,
- *   "message": "Card detection recorded"
+ *   "pollingId": "AA:BB:CC:DD:EE:FF:00",
+ *   "message": "Card detected, waiting for activation"
  * }
  */
-
-// Store detected cards in memory (in production, use Redis or database)
-const detectedCards = new Map<string, { timestamp: number }>();
-
-// Clean up old detections (older than 5 minutes)
-function cleanupOldDetections() {
-  const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
-  for (const [cardUid, data] of detectedCards.entries()) {
-    if (data.timestamp < fiveMinutesAgo) {
-      detectedCards.delete(cardUid);
-    }
-  }
-}
-
 export async function POST(request: NextRequest) {
   try {
     // Verify device authentication
@@ -40,107 +28,70 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { cardUid } = body;
+    const { uid, deviceId } = body;
 
-    if (!cardUid || typeof cardUid !== 'string') {
+    if (!uid || typeof uid !== 'string') {
       return NextResponse.json(
         { error: 'Card UID is required' },
         { status: 400 }
       );
     }
 
-    // Format UID to uppercase with colons
-    const formattedUid = cardUid.toUpperCase();
-
-    // Store detection
-    detectedCards.set(formattedUid, {
-      timestamp: Date.now()
-    });
-
-    // Cleanup old detections
-    cleanupOldDetections();
-
-    return NextResponse.json({
-      success: true,
-      message: 'Card detection recorded',
-      cardUid: formattedUid
-    });
-
-  } catch (error) {
-    console.error('Error recording card detection:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
-
-/**
- * Get pending detected cards (admin manually clicks "Refresh")
- * GET /api/cards/detected
- * 
- * Response:
- * {
- *   "cards": [
- *     {
- *       "cardUid": "AA:BB:CC:DD:EE:FF:00",
- *       "timestamp": 1234567890
- *     }
- *   ]
- * }
- */
-export async function GET(request: NextRequest) {
-  try {
-    // Cleanup old detections first
-    cleanupOldDetections();
-
-    // Get all pending cards (no auth needed - just returns what ESP32 sent)
-    const cards = Array.from(detectedCards.entries()).map(([cardUid, data]) => ({
-      cardUid,
-      timestamp: data.timestamp
-    }));
-
-    // Sort by most recent first
-    cards.sort((a, b) => b.timestamp - a.timestamp);
-
-    return NextResponse.json({
-      cards
-    });
-
-  } catch (error) {
-    console.error('Error fetching detected cards:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
-
-/**
- * Clear a card from detected list (after activation or dismissal)
- * DELETE /api/cards/detected?cardUid=AA:BB:CC:DD:EE:FF:00
- */
-export async function DELETE(request: NextRequest) {
-  try {
-    const searchParams = request.nextUrl.searchParams;
-    const cardUid = searchParams.get('cardUid');
-
-    if (!cardUid) {
+    // Validate UID format (hex bytes separated by colons)
+    if (!/^[0-9A-Fa-f:]+$/.test(uid)) {
       return NextResponse.json(
-        { error: 'Card UID is required' },
+        { error: 'Invalid UID format' },
         { status: 400 }
       );
     }
 
-    detectedCards.delete(cardUid.toUpperCase());
+    const formattedUid = uid.toUpperCase();
+    const supabase = createAdminClient();
+
+    // Check if card already activated
+    const { data: existingCard } = await supabase
+      .from('students')
+      .select('name, student_id')
+      .eq('card_uid', formattedUid)
+      .single();
+
+    if (existingCard) {
+      return NextResponse.json({
+        error: 'Card already activated',
+        student: existingCard
+      }, { status: 409 });
+    }
+
+    // Insert into pending_cards (or update if exists)
+    const { error } = await supabase
+      .from('pending_cards')
+      .upsert({
+        uid: formattedUid,
+        device_id: deviceId || 'unknown',
+        detected_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString()
+      }, {
+        onConflict: 'uid'
+      });
+
+    if (error) {
+      console.error('Insert pending card error:', error);
+      return NextResponse.json(
+        { error: 'Failed to register card detection' },
+        { status: 500 }
+      );
+    }
+
+    // Supabase Realtime will automatically push this INSERT to subscribed clients
 
     return NextResponse.json({
       success: true,
-      message: 'Card removed from detected list'
+      pollingId: formattedUid,
+      message: 'Card detected, waiting for activation'
     });
 
   } catch (error) {
-    console.error('Error removing detected card:', error);
+    console.error('Card detection error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
