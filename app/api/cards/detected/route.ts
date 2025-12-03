@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Get pending detected cards (for admin UI polling)
+ * Get pending detected cards (admin manually clicks "Refresh")
  * GET /api/cards/detected
  * 
  * Response:
@@ -91,35 +91,10 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    // Check if user is authenticated as admin
-    const supabase = await createServerSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    // Verify user is admin
-    const { data: admin } = await supabase
-      .from('admins')
-      .select('id')
-      .eq('email', user.email)
-      .single();
-
-    if (!admin) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     // Cleanup old detections first
     cleanupOldDetections();
 
-    // Get all pending cards
+    // Get all pending cards (no auth needed - just returns what ESP32 sent)
     const cards = Array.from(detectedCards.entries()).map(([cardUid, data]) => ({
       cardUid,
       timestamp: data.timestamp
@@ -142,35 +117,11 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * Remove a card from detected list (after activation or dismissal)
+ * Clear a card from detected list (after activation or dismissal)
  * DELETE /api/cards/detected?cardUid=AA:BB:CC:DD:EE:FF:00
  */
 export async function DELETE(request: NextRequest) {
   try {
-    // Check admin auth
-    const supabase = await createServerSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    const { data: admin } = await supabase
-      .from('admins')
-      .select('id')
-      .eq('email', user.email)
-      .single();
-
-    if (!admin) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     const searchParams = request.nextUrl.searchParams;
     const cardUid = searchParams.get('cardUid');
 

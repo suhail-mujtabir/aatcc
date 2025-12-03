@@ -3,7 +3,7 @@
 import { useAdmin } from '@/context/AdminContext';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Upload, CheckCircle, AlertCircle, Users, Wifi, X } from 'lucide-react';
+import { CheckCircle, AlertCircle, Users, X, RefreshCw } from 'lucide-react';
 
 interface ActivationResult {
   success: boolean;
@@ -35,33 +35,22 @@ export default function CardActivationPage() {
   const [result, setResult] = useState<ActivationResult | null>(null);
   const [recentActivations, setRecentActivations] = useState<RecentActivation[]>([]);
   const [detectedCards, setDetectedCards] = useState<DetectedCard[]>([]);
-  const [esp32Connected, setEsp32Connected] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Poll for detected cards from ESP32
-  useEffect(() => {
-    let pollInterval: NodeJS.Timeout;
-
-    const fetchDetectedCards = async () => {
-      try {
-        const response = await fetch('/api/cards/detected');
-        if (response.ok) {
-          const data = await response.json();
-          setDetectedCards(data.cards || []);
-          setEsp32Connected(data.cards.length > 0 || esp32Connected);
-        }
-      } catch (error) {
-        console.error('Error fetching detected cards:', error);
+  const fetchDetectedCards = async () => {
+    setRefreshing(true);
+    try {
+      const response = await fetch('/api/cards/detected');
+      if (response.ok) {
+        const data = await response.json();
+        setDetectedCards(data.cards || []);
       }
-    };
-
-    // Poll every 2 seconds
-    pollInterval = setInterval(fetchDetectedCards, 2000);
-    
-    // Initial fetch
-    fetchDetectedCards();
-
-    return () => clearInterval(pollInterval);
-  }, [esp32Connected]);
+    } catch (error) {
+      console.error('Error fetching detected cards:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const handleActivate = async (studentIdValue: string, cardUidValue: string) => {
     if (!studentIdValue.trim() || !cardUidValue.trim()) {
@@ -211,26 +200,33 @@ export default function CardActivationPage() {
       {/* Main content */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        {/* ESP32 Status */}
-        <div className={`${esp32Connected ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800'} border rounded-lg p-4 mb-6`}>
+        {/* Refresh Button */}
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Wifi className={`w-5 h-5 ${esp32Connected ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`} />
-              <div>
-                <p className={`text-sm font-medium ${esp32Connected ? 'text-green-900 dark:text-green-100' : 'text-gray-600 dark:text-gray-400'}`}>
-                  ESP32 Device: {esp32Connected ? 'Connected' : 'Waiting...'}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  {esp32Connected ? 'Auto-detection active' : 'Manual mode - enter card UID below'}
-                </p>
-              </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                ESP32 Card Detection
+              </p>
+              <p className="text-xs text-blue-700 dark:text-blue-300 mt-0.5">
+                Click refresh to check for cards detected by ESP32
+              </p>
             </div>
-            {detectedCards.length > 0 && (
-              <span className="px-3 py-1 bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 text-xs font-medium rounded-full">
-                {detectedCards.length} card{detectedCards.length !== 1 ? 's' : ''} detected
-              </span>
-            )}
+            <button
+              onClick={fetchDetectedCards}
+              disabled={refreshing}
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
+            </button>
           </div>
+          {detectedCards.length > 0 && (
+            <div className="mt-2 pt-2 border-t border-blue-200 dark:border-blue-700">
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                ✓ {detectedCards.length} card{detectedCards.length !== 1 ? 's' : ''} waiting for activation
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Detected Cards Alert */}
