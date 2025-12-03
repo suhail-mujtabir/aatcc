@@ -2,8 +2,8 @@
 
 import { useAdmin } from '@/context/AdminContext';
 import Link from 'next/link';
-import { useState } from 'react';
-import { Upload, CheckCircle, AlertCircle, Users } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Upload, CheckCircle, AlertCircle, Users, Wifi, X } from 'lucide-react';
 
 interface ActivationResult {
   success: boolean;
@@ -22,6 +22,11 @@ interface RecentActivation {
   timestamp: string;
 }
 
+interface DetectedCard {
+  cardUid: string;
+  timestamp: number;
+}
+
 export default function CardActivationPage() {
   const { admin } = useAdmin();
   const [studentId, setStudentId] = useState('');
@@ -29,11 +34,9 @@ export default function CardActivationPage() {
   const [activating, setActivating] = useState(false);
   const [result, setResult] = useState<ActivationResult | null>(null);
   const [recentActivations, setRecentActivations] = useState<RecentActivation[]>([]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!studentId.trim() || !cardUid.trim()) {
+  const [detectedCards, setDetectedCards] = useState<DetectedCard[]>([]);
+  const handleActivate = async (studentIdValue: string, cardUidValue: string) => {
+    if (!studentIdValue.trim() || !cardUidValue.trim()) {
       setResult({
         success: false,
         error: 'Both Student ID and Card UID are required'
@@ -51,8 +54,8 @@ export default function CardActivationPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          studentId: studentId.trim(),
-          cardUid: cardUid.trim().toUpperCase()
+          studentId: studentIdValue.trim(),
+          cardUid: cardUidValue.trim().toUpperCase()
         }),
       });
 
@@ -76,6 +79,73 @@ export default function CardActivationPage() {
         }
       });
 
+      // Add to recent activations
+      const newActivation: RecentActivation = {
+        studentId: data.student.studentId,
+        name: data.student.name,
+        cardUid: data.student.cardUid,
+        timestamp: new Date().toISOString()
+      };
+      setRecentActivations(prev => [newActivation, ...prev].slice(0, 10));
+
+      // Remove from detected cards
+      await fetch(`/api/cards/detected?cardUid=${cardUidValue.trim().toUpperCase()}`, {
+        method: 'DELETE'
+      });
+
+      // Clear form
+      setStudentId('');
+      setCardUid('');
+      
+      // Auto-focus student ID field for next card
+      setTimeout(() => {
+        document.getElementById('student-id-input')?.focus();
+      }, 100);
+
+    } catch (error) {
+      console.error('Activation error:', error);
+      setResult({
+        success: false,
+        error: 'An error occurred during activation'
+      });
+    } finally {
+      setActivating(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await handleActivate(studentId, cardUid);
+  };
+
+  const handleDetectedCardActivate = async (detectedCardUid: string) => {
+    if (!studentId.trim()) {
+      setResult({
+        success: false,
+        error: 'Please enter Student ID first'
+      });
+      return;
+    }
+    await handleActivate(studentId, detectedCardUid);
+  };
+
+  const handleDismissCard = async (cardUid: string) => {
+    try {
+      await fetch(`/api/cards/detected?cardUid=${cardUid}`, {
+        method: 'DELETE'
+      });
+      setDetectedCards(prev => prev.filter(card => card.cardUid !== cardUid));
+    } catch (error) {
+      console.error('Error dismissing card:', error);
+    }
+  };
+
+  const formatCardTimestamp = (timestamp: number) => {
+    const secondsAgo = Math.floor((Date.now() - timestamp) / 1000);
+    if (secondsAgo < 60) return `${secondsAgo}s ago`;
+    const minutesAgo = Math.floor(secondsAgo / 60);
+    return `${minutesAgo}m ago`;
+  };
       // Add to recent activations
       const newActivation: RecentActivation = {
         studentId: data.student.studentId,
@@ -141,32 +211,72 @@ export default function CardActivationPage() {
       {/* Main content */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        {/* Instructions Card */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-6">
-          <div className="flex items-start space-x-3">
-            <Upload className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
-                Card Activation Instructions
-              </h3>
-              <div className="text-sm text-blue-800 dark:text-blue-200 space-y-2">
-                <p>
-                  <strong>Current Mode:</strong> Manual Activation (before ESP32 hardware arrives)
+        {/* ESP32 Status */}
+        <div className={`${esp32Connected ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800'} border rounded-lg p-4 mb-6`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Wifi className={`w-5 h-5 ${esp32Connected ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`} />
+              <div>
+                <p className={`text-sm font-medium ${esp32Connected ? 'text-green-900 dark:text-green-100' : 'text-gray-600 dark:text-gray-400'}`}>
+                  ESP32 Device: {esp32Connected ? 'Connected' : 'Waiting...'}
                 </p>
-                <ul className="list-disc list-inside space-y-1 mt-3">
-                  <li>Read the NFC card UID using a separate NFC reader or phone</li>
-                  <li>Enter the student ID (format: YY-SS-NNN, e.g., 23-01-002)</li>
-                  <li>Enter the card UID (format: AA:BB:CC:DD:EE:FF:00)</li>
-                  <li>Click "Activate Card" to link them</li>
-                  <li>Each card can only be assigned to one student</li>
-                </ul>
-                <p className="mt-3 text-xs">
-                  <strong>Note:</strong> Once ESP32 device is ready, this page will automatically detect cards in real-time.
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  {esp32Connected ? 'Auto-detection active' : 'Manual mode - enter card UID below'}
                 </p>
               </div>
             </div>
+            {detectedCards.length > 0 && (
+              <span className="px-3 py-1 bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 text-xs font-medium rounded-full">
+                {detectedCards.length} card{detectedCards.length !== 1 ? 's' : ''} detected
+              </span>
+            )}
           </div>
         </div>
+
+        {/* Detected Cards Alert */}
+        {detectedCards.length > 0 && (
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+            <h3 className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-3">
+              📡 ESP32 Detected {detectedCards.length} Card{detectedCards.length !== 1 ? 's' : ''}
+            </h3>
+            <div className="space-y-2">
+              {detectedCards.map((card) => (
+                <div 
+                  key={card.cardUid}
+                  className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-md p-3 border border-yellow-200 dark:border-yellow-800"
+                >
+                  <div className="flex-1">
+                    <p className="text-sm font-mono text-gray-900 dark:text-white">{card.cardUid}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Detected {formatCardTimestamp(card.timestamp)}
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2 ml-4">
+                    <button
+                      onClick={() => handleDetectedCardActivate(card.cardUid)}
+                      disabled={activating || !studentId.trim()}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Activate
+                    </button>
+                    <button
+                      onClick={() => handleDismissCard(card.cardUid)}
+                      className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                      title="Dismiss"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {detectedCards.length > 0 && !studentId.trim() && (
+              <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-3">
+                💡 Enter Student ID below, then click "Activate" on the detected card
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
