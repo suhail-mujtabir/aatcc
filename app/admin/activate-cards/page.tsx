@@ -35,6 +35,34 @@ export default function CardActivationPage() {
   const [result, setResult] = useState<ActivationResult | null>(null);
   const [recentActivations, setRecentActivations] = useState<RecentActivation[]>([]);
   const [detectedCards, setDetectedCards] = useState<DetectedCard[]>([]);
+  const [esp32Connected, setEsp32Connected] = useState(false);
+
+  // Poll for detected cards from ESP32
+  useEffect(() => {
+    let pollInterval: NodeJS.Timeout;
+
+    const fetchDetectedCards = async () => {
+      try {
+        const response = await fetch('/api/cards/detected');
+        if (response.ok) {
+          const data = await response.json();
+          setDetectedCards(data.cards || []);
+          setEsp32Connected(data.cards.length > 0 || esp32Connected);
+        }
+      } catch (error) {
+        console.error('Error fetching detected cards:', error);
+      }
+    };
+
+    // Poll every 2 seconds
+    pollInterval = setInterval(fetchDetectedCards, 2000);
+    
+    // Initial fetch
+    fetchDetectedCards();
+
+    return () => clearInterval(pollInterval);
+  }, [esp32Connected]);
+
   const handleActivate = async (studentIdValue: string, cardUidValue: string) => {
     if (!studentIdValue.trim() || !cardUidValue.trim()) {
       setResult({
@@ -145,34 +173,6 @@ export default function CardActivationPage() {
     if (secondsAgo < 60) return `${secondsAgo}s ago`;
     const minutesAgo = Math.floor(secondsAgo / 60);
     return `${minutesAgo}m ago`;
-  };
-      // Add to recent activations
-      const newActivation: RecentActivation = {
-        studentId: data.student.studentId,
-        name: data.student.name,
-        cardUid: data.student.cardUid,
-        timestamp: new Date().toISOString()
-      };
-      setRecentActivations(prev => [newActivation, ...prev].slice(0, 10));
-
-      // Clear form
-      setStudentId('');
-      setCardUid('');
-      
-      // Auto-focus student ID field for next card
-      setTimeout(() => {
-        document.getElementById('student-id-input')?.focus();
-      }, 100);
-
-    } catch (error) {
-      console.error('Activation error:', error);
-      setResult({
-        success: false,
-        error: 'An error occurred during activation'
-      });
-    } finally {
-      setActivating(false);
-    }
   };
 
   const formatTimestamp = (timestamp: string) => {
@@ -313,7 +313,7 @@ export default function CardActivationPage() {
                   htmlFor="card-uid-input"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
-                  Card UID *
+                  Card UID * {detectedCards.length > 0 && <span className="text-xs text-gray-500">(or use detected card above)</span>}
                 </label>
                 <input
                   id="card-uid-input"
