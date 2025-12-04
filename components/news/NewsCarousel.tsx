@@ -111,6 +111,7 @@ export default function NewsCarousel() {
                       priority={index === 0}
                       loading={index === 0 ? 'eager' : 'lazy'}
                       quality={75}
+                      unoptimized={true}
                     />
                   </div>
 

@@ -92,7 +92,7 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between text-white">
           {/* LOGO + TITLE */}
-          <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group flex-shrink-0">
+          <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group flex-shrink-0" prefetch={false}>
             <Image
               src="/logo.png"
               alt="AATCC Logo"
@@ -134,6 +134,7 @@ export default function Navbar() {
                           <Link
                             href={child.page}
                             className="block px-4 py-3 text-white hover:bg-green-600 transition-colors duration-200 text-sm"
+                            prefetch={false}
                           >
                             {child.label}
                           </Link>
@@ -231,6 +232,7 @@ export default function Navbar() {
                                       href={child.page}
                                       className="block py-2 text-gray-300 hover:text-green-400 transition-colors duration-200"
                                       onClick={() => setMobileMenuOpen(false)}
+                                      prefetch={false}
                                     >
                                       {child.label}
                                     </Link>
@@ -245,6 +247,7 @@ export default function Navbar() {
                           href={item.page}
                           className="block py-3 text-white font-medium text-lg hover:text-green-400 transition-colors duration-200"
                           onClick={() => setMobileMenuOpen(false)}
+                          prefetch={false}
                         >
                           {item.label}
                         </Link>

@@ -18,7 +18,7 @@ export default function NewsCard({ article, index }: NewsCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
     >
-      <Link href={`/news/${article.slug}`}>
+      <Link href={`/news/${article.slug}`} prefetch={false}>
         <div className="group bg-gray-900 rounded-xl overflow-hidden border dark:border-white border-gray-800 hover:border-blue-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1">
           {/* Image */}
           <div className="relative aspect-video overflow-hidden bg-gray-800">
@@ -30,6 +30,7 @@ export default function NewsCard({ article, index }: NewsCardProps) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               loading="lazy"
               quality={75}
+              unoptimized={true}
             />
           </div>
           

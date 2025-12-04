@@ -64,6 +64,19 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // Apply these headers to the homepage (/)
+        source: '/',
+        headers: [
+          {
+            key: 'Cache-Control',
+            // public = cacheable by anyone
+            // max-age=3600 = Cache in browser for 1 hour (3600 seconds)
+            // must-revalidate = After 1 hour, check Vercel again
+            value: 'public, max-age=3600, must-revalidate',
+          },
+        ],
+      },
     ];
   },
 };

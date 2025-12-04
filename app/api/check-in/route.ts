@@ -1,63 +1,66 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase';
-import { verifyDeviceAuth } from '@/lib/device-auth';
 
 /**
  * POST /api/check-in
  * ESP32 device submits NFC card UID for attendance recording
  * 
- * Request body: { cardUid: string }
- * Headers: X-Device-API-Key
+ * No authentication required (public endpoint for ESP32)
+ * 
+ * Request body: { uid: string, eventId: string, deviceId?: string }
  * 
  * Flow:
- * 1. Verify device authentication
- * 2. Find active event
- * 3. Lookup student by card UID
- * 4. Verify student is registered for event
- * 5. Check for duplicate check-in
- * 6. Record attendance
- * 7. Return success with student info and counts
+ * 1. Validate event ID (ensure event is still active)
+ * 2. Lookup student by card UID
+ * 3. Verify student is registered for event
+ * 4. Check for duplicate check-in
+ * 5. Record attendance
+ * 6. Return success with student info
  */
 export async function POST(request: NextRequest) {
-  // 1. Verify device authentication
-  if (!verifyDeviceAuth(request)) {
-    return NextResponse.json(
-      { error: 'Unauthorized device' },
-      { status: 401 }
-    );
-  }
-
   try {
-    const { cardUid } = await request.json();
+    const { uid, eventId, deviceId } = await request.json();
 
     // Validate input
-    if (!cardUid || typeof cardUid !== 'string') {
+    if (!uid || typeof uid !== 'string') {
       return NextResponse.json(
         { error: 'Card UID required' },
         { status: 400 }
       );
     }
 
+    if (!eventId || typeof eventId !== 'string') {
+      return NextResponse.json(
+        { error: 'Event ID required' },
+        { status: 400 }
+      );
+    }
+
     // Validate card UID format (uppercase hex with colons)
-    if (!/^[0-9A-F:]+$/i.test(cardUid)) {
+    if (!/^[0-9A-F:]+$/i.test(uid)) {
       return NextResponse.json(
         { error: 'Invalid card UID format' },
         { status: 400 }
       );
     }
 
+    const formattedUid = uid.toUpperCase();
     const supabase = createAdminClient();
 
-    // 2. Find active event
+    // 1. Verify event is still active (quick validation)
     const { data: event, error: eventError } = await supabase
       .from('events')
       .select('id, name')
+      .eq('id', eventId)
       .eq('status', 'active')
       .is('deleted_at', null)
       .maybeSingle();
 
     if (eventError) {
-      console.error('Event query error:', eventError);
+      console.error('[Check-in] Event validation error:', {
+        eventId,
+        error: eventError.message
+      });
       return NextResponse.json(
         { error: 'Database error' },
         { status: 500 }
@@ -66,20 +69,23 @@ export async function POST(request: NextRequest) {
 
     if (!event) {
       return NextResponse.json(
-        { error: 'No active event at this time' },
+        { error: 'Event not found or no longer active' },
         { status: 404 }
       );
     }
 
-    // 3. Lookup student by card UID
+    // 2. Lookup student by card UID
     const { data: student, error: studentError } = await supabase
       .from('students')
       .select('id, student_id, name')
-      .eq('card_uid', cardUid.toUpperCase())
+      .eq('card_uid', formattedUid)
       .maybeSingle();
 
     if (studentError) {
-      console.error('Student lookup error:', studentError);
+      console.error('[Check-in] Student lookup error:', {
+        uid: formattedUid,
+        error: studentError.message
+      });
       return NextResponse.json(
         { error: 'Database error' },
         { status: 500 }
@@ -93,7 +99,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Check if student is registered for event
+    // 3. Check if student is registered for event
     const { data: registration, error: regError } = await supabase
       .from('registrations')
       .select('id')
@@ -102,7 +108,11 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (regError) {
-      console.error('Registration check error:', regError);
+      console.error('[Check-in] Registration check error:', {
+        studentId: student.id,
+        eventId: event.id,
+        error: regError.message
+      });
       return NextResponse.json(
         { error: 'Database error' },
         { status: 500 }
@@ -116,7 +126,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 5. Check for duplicate check-in
+    // 4. Check for duplicate check-in
     const { data: existing, error: existingError } = await supabase
       .from('attendance')
       .select('id')
@@ -125,7 +135,11 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (existingError) {
-      console.error('Duplicate check error:', existingError);
+      console.error('[Check-in] Duplicate check error:', {
+        studentId: student.id,
+        eventId: event.id,
+        error: existingError.message
+      });
       return NextResponse.json(
         { error: 'Database error' },
         { status: 500 }
@@ -139,7 +153,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 6. Record attendance
+    // 5. Record attendance
     const { error: insertError } = await supabase
       .from('attendance')
       .insert({
@@ -148,29 +162,18 @@ export async function POST(request: NextRequest) {
       });
 
     if (insertError) {
-      console.error('Attendance insert error:', insertError);
+      console.error('[Check-in] Attendance insert error:', {
+        studentId: student.id,
+        eventId: event.id,
+        error: insertError.message
+      });
       return NextResponse.json(
         { error: 'Failed to record attendance' },
         { status: 500 }
       );
     }
 
-    // 7. Get attendance counts for display
-    const [
-      { count: attendedCount },
-      { count: registeredCount }
-    ] = await Promise.all([
-      supabase
-        .from('attendance')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_id', event.id),
-      supabase
-        .from('registrations')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_id', event.id)
-    ]);
-
-    // 8. Success response
+    // Success response - ESP32 only needs student info
     return NextResponse.json({
       success: true,
       student: {
@@ -179,16 +182,18 @@ export async function POST(request: NextRequest) {
       },
       event: {
         name: event.name
-      },
-      attendedCount: attendedCount || 0,
-      registeredCount: registeredCount || 0
+      }
     });
 
   } catch (error) {
-    console.error('Check-in error:', error);
+    console.error('[Check-in] Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
+
+// Use Edge runtime for better performance
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';

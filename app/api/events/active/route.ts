@@ -1,24 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase';
-import { verifyDeviceAuth } from '@/lib/device-auth';
 
 /**
  * GET /api/events/active
  * ESP32 device retrieves currently active event information
  * 
- * Headers: X-Device-API-Key
+ * No authentication required (public endpoint for ESP32)
  * 
- * Returns: Active event with registration/attendance counts, or null if no active event
+ * Returns: Active event details, or null if no active event
  */
 export async function GET(request: NextRequest) {
-  // Verify device authentication
-  if (!verifyDeviceAuth(request)) {
-    return NextResponse.json(
-      { error: 'Unauthorized device' },
-      { status: 401 }
-    );
-  }
-
   try {
     const supabase = createAdminClient();
 
@@ -31,7 +22,9 @@ export async function GET(request: NextRequest) {
       .maybeSingle();
 
     if (eventError) {
-      console.error('Event query error:', eventError);
+      console.error('[Active Event] Query error:', {
+        error: eventError.message
+      });
       return NextResponse.json(
         { error: 'Database error' },
         { status: 500 }
@@ -43,38 +36,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ event: null });
     }
 
-    // Get registration and attendance counts
-    const [
-      { count: registeredCount },
-      { count: attendedCount }
-    ] = await Promise.all([
-      supabase
-        .from('registrations')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_id', event.id),
-      supabase
-        .from('attendance')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_id', event.id)
-    ]);
-
+    // Return event details (no counts needed for ESP32)
     return NextResponse.json({
       event: {
         id: event.id,
         name: event.name,
         description: event.description,
         startTime: event.start_time,
-        endTime: event.end_time,
-        registeredCount: registeredCount || 0,
-        attendedCount: attendedCount || 0
+        endTime: event.end_time
       }
     });
 
   } catch (error) {
-    console.error('Active event error:', error);
+    console.error('[Active Event] Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
+
+// Use Edge runtime for better performance
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';

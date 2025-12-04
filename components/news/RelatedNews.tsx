@@ -11,7 +11,7 @@ export default function RelatedNews({ articles }: RelatedNewsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {articles.map(article => (
-        <Link key={article.id} href={`/news/${article.slug}`}>
+        <Link key={article.id} href={`/news/${article.slug}`} prefetch={false}>
           <div className="group dark:bg-gray-900/50 rounded-xl overflow-hidden border dark:border-white border-gray-800 hover:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
             <div className="relative aspect-video overflow-hidden bg-gray-800">
               <Image
@@ -22,6 +22,7 @@ export default function RelatedNews({ articles }: RelatedNewsProps) {
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
                 loading="lazy"
                 quality={75}
+                unoptimized={true}
               />
             </div>
             

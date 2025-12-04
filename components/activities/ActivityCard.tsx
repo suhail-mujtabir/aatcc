@@ -72,6 +72,7 @@ export default function ActivityCard({
       <Link
         href={`/activities/${activity.category}/${activity.slug}`}
         className="block h-full"
+        prefetch={false}
       >
         <div className="h-full flex flex-col bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
           {/* Image Section */}
@@ -84,6 +85,7 @@ export default function ActivityCard({
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               loading="lazy"
               quality={75}
+              unoptimized={true}
             />
             
             {/* Category Badge - Positioned on image */}
