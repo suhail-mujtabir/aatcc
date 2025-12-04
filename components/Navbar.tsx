@@ -115,6 +115,7 @@ export default function Navbar() {
                   <Link
                     href={it.page}
                     className="px-1 py-1 text-white font-medium block"
+                    prefetch={false}
                   >
                     <span className="relative z-10 transition-colors duration-500 group-hover:text-green-400 text-sm xl:text-base">
                       {it.label}
