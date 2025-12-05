@@ -1,15 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase';
+import { verifyDeviceAuth } from '@/lib/device-auth';
 
 /**
  * GET /api/events/active
  * ESP32 device retrieves currently active event information
  * 
- * No authentication required (public endpoint for ESP32)
+ * Requires device authentication via X-Device-API-Key header
+ * 
+ * Headers: X-Device-API-Key
  * 
  * Returns: Active event details, or null if no active event
  */
 export async function GET(request: NextRequest) {
+  // Verify device authentication
+  const authError = verifyDeviceAuth(request);
+  if (authError) {
+    return authError;
+  }
+
   try {
     const supabase = createAdminClient();
 

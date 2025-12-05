@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase';
+import { verifyDeviceAuth } from '@/lib/device-auth';
 
 /**
  * ESP32 reports detected card UID
  * POST /api/cards/detected
  * 
- * No authentication required for card detection
+ * Requires device authentication via X-Device-API-Key header
+ * 
+ * Headers: X-Device-API-Key
  * 
  * Request body:
  * {
@@ -21,6 +24,12 @@ import { createAdminClient } from '@/lib/supabase';
  * }
  */
 export async function POST(request: NextRequest) {
+  // Verify device authentication
+  const authError = verifyDeviceAuth(request);
+  if (authError) {
+    return authError;
+  }
+
   try {
     const body = await request.json();
     const { uid, deviceId } = body;

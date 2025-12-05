@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase';
+import { verifyDeviceAuth } from '@/lib/device-auth';
 
 /**
  * POST /api/check-in
  * ESP32 device submits NFC card UID for attendance recording
  * 
- * No authentication required (public endpoint for ESP32)
+ * Requires device authentication via X-Device-API-Key header
+ * 
+ * Headers: X-Device-API-Key
  * 
  * Request body: { uid: string, eventId: string, deviceId?: string }
  * 
@@ -18,6 +21,12 @@ import { createAdminClient } from '@/lib/supabase';
  * 6. Return success with student info
  */
 export async function POST(request: NextRequest) {
+  // Verify device authentication
+  const authError = verifyDeviceAuth(request);
+  if (authError) {
+    return authError;
+  }
+
   try {
     const { uid, eventId, deviceId } = await request.json();
 
