@@ -40,7 +40,7 @@ INSERT INTO certificate_templates (
   'Standard certificate template used for all events',
   '1__fQ2Nt-FlBzb0xsabGEZRm0HxhVLBlN0JqorT3msnY', -- Replace with your Slides template ID
   'Certificate of Completion: {{event}}', -- {{event}} will be replaced with actual event name
-  NULL, -- Set to your Google Docs ID if you have an email template, or leave NULL for inline HTML
+  '1MZz0SGjJ5wAPPrs29fZdHA5W21PpqEu4w3W16Jx7G0c', -- Set to your Google Docs ID if you have an email template, or leave NULL for inline HTML
   true
 );
 

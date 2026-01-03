@@ -23,7 +23,7 @@
  * Generate secure keys using: node -e "console.log('prod_sk_' + require('crypto').randomBytes(32).toString('hex'))"
  */
 const API_KEYS = {
-  production: 'YOUR_PRODUCTION_API_KEY_HERE',
+  production: 'prod_sk_8d9c798b50670c2784dc11890b5c4c0d0d8e53ede244e62d91ee77f149bbe6e2',
   staging: 'YOUR_STAGING_API_KEY_HERE'
 };
 

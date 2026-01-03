@@ -123,7 +123,7 @@ export async function POST(
       );
     }
 
-    console.log(`[Send Certificates] Using template: ${template.slides_template_id}`);
+    console.log(`[Send Certificates] ✅ Using automatic template from database: ${template.slides_template_id}`);
 
     // 7. Prepare email subject with event name interpolation
     const emailSubject = template.email_subject_template
