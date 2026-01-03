@@ -4,22 +4,38 @@ import { verifyDeviceAuth } from '@/lib/device-auth';
 
 /**
  * POST /api/check-in
- * ESP32 device submits NFC card UID for attendance recording
+ * ESP32 device bulk uploads attendance records after event (offline mode)
  * 
  * Requires device authentication via X-Device-API-Key header
  * 
  * Headers: X-Device-API-Key
  * 
- * Request body: { uid: string, eventId: string, deviceId?: string }
+ * Request body: { 
+ *   eventId: string, 
+ *   uids: string[],
+ *   deviceId?: string 
+ * }
  * 
  * Flow:
  * 1. Validate event ID (ensure event is still active)
- * 2. Lookup student by card UID
- * 3. Verify student is registered for event
- * 4. Check for duplicate check-in
- * 5. Record attendance
- * 6. Return success with student info
+ * 2. Lookup all students by card UIDs (batch query)
+ * 3. Verify students are registered for event (batch query)
+ * 4. Bulk insert attendance records with duplicate handling
+ * 5. Return detailed results (inserted/skipped/failed per UID)
+ * 
+ * Note: This endpoint is idempotent - safe to retry on network failure.
+ * Duplicates are automatically skipped via database unique constraint.
  */
+
+interface AttendanceDetail {
+  uid: string;
+  status: 'inserted' | 'skipped' | 'failed';
+  studentName?: string;
+  reason?: string;
+}
+
+const MAX_UIDS_PER_REQUEST = 500;
+
 export async function POST(request: NextRequest) {
   // Verify device authentication
   const authError = verifyDeviceAuth(request);
@@ -28,16 +44,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { uid, eventId, deviceId } = await request.json();
+    const { eventId, uids, deviceId } = await request.json();
 
     // Validate input
-    if (!uid || typeof uid !== 'string') {
-      return NextResponse.json(
-        { error: 'Card UID required' },
-        { status: 400 }
-      );
-    }
-
     if (!eventId || typeof eventId !== 'string') {
       return NextResponse.json(
         { error: 'Event ID required' },
@@ -45,18 +54,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate card UID format (uppercase hex with colons)
-    if (!/^[0-9A-F:]+$/i.test(uid)) {
+    if (!Array.isArray(uids)) {
       return NextResponse.json(
-        { error: 'Invalid card UID format' },
+        { error: 'UIDs must be an array' },
         { status: 400 }
       );
     }
 
-    const formattedUid = uid.toUpperCase();
+    if (uids.length === 0) {
+      return NextResponse.json(
+        { error: 'UIDs array is empty' },
+        { status: 400 }
+      );
+    }
+
+    if (uids.length > MAX_UIDS_PER_REQUEST) {
+      return NextResponse.json(
+        { error: `Maximum ${MAX_UIDS_PER_REQUEST} UIDs per request` },
+        { status: 400 }
+      );
+    }
+
+    // Validate and format all UIDs
+    const formattedUids = uids.map((uid) => {
+      if (typeof uid !== 'string') {
+        throw new Error('All UIDs must be strings');
+      }
+      // Validate format (uppercase hex with colons)
+      if (!/^[0-9A-F:]+$/i.test(uid)) {
+        throw new Error(`Invalid UID format: ${uid}`);
+      }
+      return uid.toUpperCase();
+    });
+
     const supabase = createAdminClient();
 
-    // 1. Verify event is still active (quick validation)
+    // 1. Verify event exists and is active
     const { data: event, error: eventError } = await supabase
       .from('events')
       .select('id, name')
@@ -66,7 +99,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (eventError) {
-      console.error('[Check-in] Event validation error:', {
+      console.error('[Bulk Check-in] Event validation error:', {
         eventId,
         error: eventError.message
       });
@@ -78,21 +111,19 @@ export async function POST(request: NextRequest) {
 
     if (!event) {
       return NextResponse.json(
-        { error: 'Event not found or no longer active' },
+        { error: 'Event not found or not active' },
         { status: 404 }
       );
     }
 
-    // 2. Lookup student by card UID
-    const { data: student, error: studentError } = await supabase
+    // 2. Lookup all students by UIDs in a single query
+    const { data: students, error: studentError } = await supabase
       .from('students')
-      .select('id, student_id, name')
-      .eq('card_uid', formattedUid)
-      .maybeSingle();
+      .select('id, student_id, name, card_uid')
+      .in('card_uid', formattedUids);
 
     if (studentError) {
-      console.error('[Check-in] Student lookup error:', {
-        uid: formattedUid,
+      console.error('[Bulk Check-in] Student lookup error:', {
         error: studentError.message
       });
       return NextResponse.json(
@@ -101,25 +132,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!student) {
-      return NextResponse.json(
-        { error: 'Card not registered' },
-        { status: 404 }
-      );
+    // Create UID -> Student mapping
+    const uidToStudent = new Map(
+      (students || []).map((s: any) => [s.card_uid, s])
+    );
+
+    // 3. Get all student IDs that were found
+    const foundStudentIds = Array.from(uidToStudent.values()).map((s: any) => s.id);
+
+    if (foundStudentIds.length === 0) {
+      // None of the UIDs matched any students
+      const details: AttendanceDetail[] = formattedUids.map((uid) => ({
+        uid,
+        status: 'failed',
+        reason: 'Student not found'
+      }));
+
+      return NextResponse.json({
+        success: true,
+        eventId: event.id,
+        eventName: event.name,
+        results: {
+          total: formattedUids.length,
+          inserted: 0,
+          skipped: 0,
+          failed: formattedUids.length
+        },
+        details
+      });
     }
 
-    // 3. Check if student is registered for event
-    const { data: registration, error: regError } = await supabase
+    // 4. Check which students are registered for this event (batch query)
+    const { data: registrations, error: regError } = await supabase
       .from('registrations')
-      .select('id')
-      .eq('student_id', student.id)
+      .select('student_id')
       .eq('event_id', event.id)
-      .maybeSingle();
+      .in('student_id', foundStudentIds);
 
     if (regError) {
-      console.error('[Check-in] Registration check error:', {
-        studentId: student.id,
-        eventId: event.id,
+      console.error('[Bulk Check-in] Registration check error:', {
         error: regError.message
       });
       return NextResponse.json(
@@ -128,74 +179,137 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!registration) {
-      return NextResponse.json(
-        { error: 'Not registered for this event' },
-        { status: 403 }
-      );
-    }
+    // Create Set of registered student IDs for O(1) lookup
+    const registeredStudentIds = new Set(
+      (registrations || []).map((r: any) => r.student_id)
+    );
 
-    // 4. Check for duplicate check-in
-    const { data: existing, error: existingError } = await supabase
-      .from('attendance')
-      .select('id')
-      .eq('student_id', student.id)
-      .eq('event_id', event.id)
-      .maybeSingle();
+    // 5. Prepare attendance records for bulk insert
+    const attendanceRecords: { student_id: string; event_id: string }[] = [];
+    const details: AttendanceDetail[] = [];
 
-    if (existingError) {
-      console.error('[Check-in] Duplicate check error:', {
-        studentId: student.id,
-        eventId: event.id,
-        error: existingError.message
-      });
-      return NextResponse.json(
-        { error: 'Database error' },
-        { status: 500 }
-      );
-    }
+    for (const uid of formattedUids) {
+      const student = uidToStudent.get(uid);
 
-    if (existing) {
-      return NextResponse.json(
-        { error: 'Already checked in' },
-        { status: 409 }
-      );
-    }
+      if (!student) {
+        // Student not found
+        details.push({
+          uid,
+          status: 'failed',
+          reason: 'Student not found'
+        });
+        continue;
+      }
 
-    // 5. Record attendance
-    const { error: insertError } = await supabase
-      .from('attendance')
-      .insert({
+      if (!registeredStudentIds.has(student.id)) {
+        // Student not registered for event
+        details.push({
+          uid,
+          status: 'failed',
+          studentName: student.name,
+          reason: 'Not registered for event'
+        });
+        continue;
+      }
+
+      // Valid - prepare for insert
+      attendanceRecords.push({
         student_id: student.id,
         event_id: event.id
       });
 
-    if (insertError) {
-      console.error('[Check-in] Attendance insert error:', {
-        studentId: student.id,
-        eventId: event.id,
-        error: insertError.message
+      // Pre-mark as inserted (will update if duplicate)
+      details.push({
+        uid,
+        status: 'inserted',
+        studentName: student.name
       });
-      return NextResponse.json(
-        { error: 'Failed to record attendance' },
-        { status: 500 }
-      );
     }
 
-    // Success response - ESP32 only needs student info
+    // 6. Bulk insert attendance records with upsert
+    // ignoreDuplicates: true handles already checked-in students
+    let insertedCount = 0;
+    let skippedCount = 0;
+
+    if (attendanceRecords.length > 0) {
+      const { data: insertedRecords, error: insertError } = await supabase
+        .from('attendance')
+        .upsert(attendanceRecords, {
+          onConflict: 'student_id,event_id',
+          ignoreDuplicates: true
+        })
+        .select('student_id');
+
+      if (insertError) {
+        console.error('[Bulk Check-in] Attendance insert error:', {
+          error: insertError.message
+        });
+        return NextResponse.json(
+          { error: 'Failed to record attendance' },
+          { status: 500 }
+        );
+      }
+
+      // Count actual inserts vs skipped duplicates
+      insertedCount = insertedRecords?.length || 0;
+      skippedCount = attendanceRecords.length - insertedCount;
+
+      // Update details for skipped records (duplicates)
+      if (skippedCount > 0) {
+        const insertedStudentIds = new Set(
+          (insertedRecords || []).map((r: any) => r.student_id)
+        );
+
+        details.forEach((detail) => {
+          if (detail.status === 'inserted') {
+            const student = uidToStudent.get(detail.uid);
+            if (student && !insertedStudentIds.has(student.id)) {
+              detail.status = 'skipped';
+              detail.reason = 'Already checked in';
+            }
+          }
+        });
+      }
+    }
+
+    const failedCount = details.filter((d) => d.status === 'failed').length;
+
+    // 7. Log bulk operation
+    console.log('[Bulk Check-in] Operation completed:', {
+      eventId: event.id,
+      eventName: event.name,
+      deviceId: deviceId || 'unknown',
+      total: formattedUids.length,
+      inserted: insertedCount,
+      skipped: skippedCount,
+      failed: failedCount
+    });
+
+    // 8. Return detailed results
     return NextResponse.json({
       success: true,
-      student: {
-        name: student.name,
-        studentId: student.student_id
+      eventId: event.id,
+      eventName: event.name,
+      results: {
+        total: formattedUids.length,
+        inserted: insertedCount,
+        skipped: skippedCount,
+        failed: failedCount
       },
-      event: {
-        name: event.name
-      }
+      details
     });
 
   } catch (error) {
-    console.error('[Check-in] Unexpected error:', error);
+    console.error('[Bulk Check-in] Unexpected error:', error);
+    
+    // Handle validation errors with more specific messages
+    if (error instanceof Error && error.message.includes('UID')) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

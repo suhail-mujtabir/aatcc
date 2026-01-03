@@ -66,6 +66,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate required columns exist
+    const requiredColumns = ['student_id', 'name', 'pass', 'email'];
+    const headers = parsed.meta.fields || [];
+    const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+    
+    if (missingColumns.length > 0) {
+      return NextResponse.json(
+        { 
+          error: `Missing required columns: ${missingColumns.join(', ')}`,
+          details: `Found columns: ${headers.join(', ')}`,
+          hint: 'Column names are case-insensitive. Make sure headers match: student_id, name, pass, email'
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check for duplicate column names
+    const duplicateColumns = headers.filter((col, index) => headers.indexOf(col) !== index);
+    if (duplicateColumns.length > 0) {
+      return NextResponse.json(
+        { 
+          error: `Duplicate column names found: ${[...new Set(duplicateColumns)].join(', ')}`,
+          hint: 'Each column name must appear only once in the header row'
+        },
+        { status: 400 }
+      );
+    }
+
     const rows = parsed.data;
 
     if (rows.length === 0) {

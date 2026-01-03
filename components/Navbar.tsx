@@ -148,32 +148,79 @@ export default function Navbar() {
             ))}
             <li><SnowToggle /></li>
             <li><ThemeToggle /></li>
+            <li>
+              <Link
+                href="/login"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-green-600 dark:hover:bg-green-500 transition-colors duration-300"
+                aria-label="Student Login"
+                prefetch={false}
+              >
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </Link>
+            </li>
           </ul>
 
-          {/* MOBILE MENU BUTTON */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-800/50 transition-colors duration-200"
-            aria-label="Toggle menu"
-          >
-            <div className="w-6 h-6 flex flex-col justify-center space-y-1">
-              <span
-                className={`block h-0.5 bg-white transition-all duration-300 ${
-                  mobileMenuOpen ? "rotate-45 translate-y-1.5" : ""
-                }`}
-              />
-              <span
-                className={`block h-0.5 bg-white transition-all duration-300 ${
-                  mobileMenuOpen ? "opacity-0" : "opacity-100"
-                }`}
-              />
-              <span
-                className={`block h-0.5 bg-white transition-all duration-300 ${
-                  mobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
-                }`}
-              />
-            </div>
-          </button>
+          {/* MOBILE CONTROLS */}
+          <div className="lg:hidden flex items-center space-x-3">
+            <Link
+              href="/login"
+              className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-700 dark:bg-gray-300 hover:bg-green-600 dark:hover:bg-green-500 transition-colors duration-300"
+              aria-label="Student Login"
+              prefetch={false}
+            >
+              <svg
+                className="w-5 h-5 text-white dark:text-gray-900"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            </Link>
+            
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg hover:bg-gray-800/50 transition-colors duration-200"
+              aria-label="Toggle menu"
+            >
+              <div className="w-6 h-6 flex flex-col justify-center space-y-1">
+                <span
+                  className={`block h-0.5 bg-white transition-all duration-300 ${
+                    mobileMenuOpen ? "rotate-45 translate-y-1.5" : ""
+                  }`}
+                />
+                <span
+                  className={`block h-0.5 bg-white transition-all duration-300 ${
+                    mobileMenuOpen ? "opacity-0" : "opacity-100"
+                  }`}
+                />
+                <span
+                  className={`block h-0.5 bg-white transition-all duration-300 ${
+                    mobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+                  }`}
+                />
+              </div>
+            </button>
+          </div>
         </div>
 
         {/* MOBILE MENU OVERLAY */}
