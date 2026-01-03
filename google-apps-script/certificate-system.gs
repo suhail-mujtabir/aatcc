@@ -66,7 +66,7 @@ function doPost(e) {
   try {
     // 1. Parse incoming request
     const data = JSON.parse(e.postData.contents);
-    const { apiKey, eventId, eventName, eventDate, attendees, origin } = data;
+    const { apiKey, eventId, eventName, eventDate, attendees, origin, certificateConfig } = data;
     
     // 2. Security validations
     if (!isValidApiKey(apiKey)) {
@@ -101,13 +101,33 @@ function doPost(e) {
       return createErrorResponse('Invalid email addresses detected', 400);
     }
     
-    // 5. Get event configuration (template IDs, email subject, etc.)
-    const config = getEventConfig(eventId);
-    if (!config) {
-      return createErrorResponse(
-        `Event configuration not found. Please add event ${eventId} to the Config sheet.`,
-        404
-      );
+    // 5. Get certificate configuration
+    // NEW: Prefer certificateConfig from payload (automatic mode)
+    // FALLBACK: Query Config sheet if certificateConfig not provided (legacy mode)
+    let config;
+    if (certificateConfig && certificateConfig.slidesTemplateId && certificateConfig.emailSubject) {
+      // Automatic mode: Use config from database (passed via Next.js)
+      config = certificateConfig;
+      Logger.log('Using automatic certificate config from payload');
+    } else {
+      // Legacy mode: Query Config sheet (backward compatible)
+      Logger.log('⚠️ No certificateConfig in payload, falling back to Config sheet (legacy mode)');
+      const sheetConfig = getEventConfig(eventId);
+      if (!sheetConfig) {
+        return createErrorResponse(
+          `Event configuration not found. Please either:\n` +
+          `1. Configure default template in Supabase (recommended), OR\n` +
+          `2. Add event ${eventId} to the Config sheet (legacy)`,
+          404
+        );
+      }
+      // Map legacy config format to new format
+      config = {
+        slidesTemplateId: sheetConfig.certificateTemplateId,
+        emailSubject: sheetConfig.emailSubject,
+        emailBodyDocId: sheetConfig.emailBodyDocId,
+        emailBodyHtml: null
+      };
     }
     
     // 6. Log request
@@ -169,6 +189,12 @@ function isValidEmail(email) {
 /**
  * Get event configuration from "Config" sheet
  * 
+ * ⚠️ LEGACY MODE: This function is now optional!
+ * The new automatic mode passes certificateConfig in the webhook payload,
+ * eliminating the need for manual Config sheet management.
+ * 
+ * This function remains for backward compatibility and manual override scenarios.
+ * 
  * Expected sheet structure:
  * | Event ID | Certificate Template ID | Email Subject | Email Body Doc ID |
  * | event-uuid | google-slides-id | Subject text | google-doc-id |
@@ -177,7 +203,8 @@ function getEventConfig(eventId) {
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Config');
     if (!sheet) {
-      throw new Error('Config sheet not found');
+      Logger.log('⚠️ Config sheet not found (this is OK if using automatic mode)');
+      return null;
     }
     
     const data = sheet.getDataRange().getValues();
@@ -221,8 +248,20 @@ function processCertificates(attendees, config, eventName, eventDate) {
   };
   
   try {
-    // Get email template once
-    const emailBodyTemplate = getEmailTemplate(config.emailBodyDocId, eventName);
+    // Get email template
+    let emailBodyTemplate;
+    
+    if (config.emailBodyHtml) {
+      // NEW: Use inline HTML from payload (automatic mode)
+      emailBodyTemplate = config.emailBodyHtml;
+      Logger.log('Using inline HTML email template from payload');
+    } else if (config.emailBodyDocId) {
+      // LEGACY: Load from Google Doc (manual mode or custom override)
+      emailBodyTemplate = getEmailTemplate(config.emailBodyDocId, eventName);
+      Logger.log(`Using email template from Google Doc: ${config.emailBodyDocId}`);
+    } else {
+      throw new Error('No email template provided (neither emailBodyHtml nor emailBodyDocId)');
+    }
     
     // Process each attendee
     attendees.forEach((attendee, index) => {
@@ -236,7 +275,7 @@ function processCertificates(attendees, config, eventName, eventDate) {
         
         // Generate certificate PDF
         const pdfBlob = generateCertificate(
-          config.certificateTemplateId,
+          config.slidesTemplateId || config.certificateTemplateId, // Support both formats
           attendee.name,
           eventName,
           eventDate || attendee.checkedInAt

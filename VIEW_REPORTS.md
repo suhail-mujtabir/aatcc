@@ -2,9 +2,11 @@
 
 ## 📋 Overview
 
-This system enables administrators to view attendance reports for completed events and automatically send personalized digital certificates to attendees via email. The system integrates your Next.js admin dashboard with Google Apps Script for certificate generation and email distribution.
+This system enables administrators to view attendance reports for completed events and automatically send personalized digital certificates to attendees via email. **The system is now fully automatic** - certificate templates are configured once in the database, and admins never need to touch Google Sheets!
 
-**Last Updated:** January 3, 2026
+**✨ NEW: Zero-Config Mode** - Just set up once and send certificates with one click forever!
+
+**Last Updated:** January 3, 2026 (Updated with automatic certificate configuration)
 
 ---
 
@@ -14,6 +16,8 @@ This system enables administrators to view attendance reports for completed even
 ✅ **Download CSV** - Export attendance data for records/analysis  
 ✅ **Automated Certificates** - Generate personalized certificates from Google Slides templates  
 ✅ **Bulk Email Sending** - Send certificates to all attendees with one click  
+✅ **🆕 Zero Google Sheets Management** - Template configured once in database, no manual event setup  
+✅ **🆕 Same Template for All Events** - Consistent branding, automatic event name interpolation  
 ✅ **No Storage Costs** - Certificates generated on-the-fly, not stored  
 ✅ **Edu Email Benefits** - Use .edu account for unlimited email sending  
 ✅ **Secure Webhook** - API key authentication prevents unauthorized access  
@@ -33,27 +37,31 @@ This system enables administrators to view attendance reports for completed even
 │ 4. Options:                                                  │
 │    A. Download CSV for records                              │
 │    B. Click "Send Certificates" button                      │
-└─────────────────────────────────────────────────────────────┘
-                            ↓ (Option B selected)
 ┌─────────────────────────────────────────────────────────────┐
 │ BACKEND PROCESSING                                          │
 ├─────────────────────────────────────────────────────────────┤
 │ 1. Next.js API fetches event & attendee data from Supabase │
-│ 2. Validates all emails are present                         │
-│ 3. Calls Google Apps Script webhook with attendee data     │
+│ 2. Queries default certificate template from database      │
+│ 3. Interpolates event name into email subject              │
+│ 4. Validates all emails are present                         │
+│ 5. Calls Google Apps Script webhook with:                  │
+│    - Attendee data                                          │
+│    - Certificate configuration (template IDs, subject)      │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ GOOGLE APPS SCRIPT AUTOMATION                               │
 ├─────────────────────────────────────────────────────────────┤
 │ 1. Verifies API key (security)                             │
-│ 2. Gets event config (template IDs) from Google Sheet      │
+│ 2. Uses certificateConfig from payload (no Sheet needed!)  │
 │ 3. For each attendee:                                       │
 │    - Copy certificate template (Google Slides)              │
 │    - Replace {{name}}, {{event}}, {{date}} placeholders    │
 │    - Convert to PDF                                         │
 │    - Send email with PDF attachment                         │
 │    - Delete temporary slide                                 │
+│ 4. Returns results (sent/failed counts)                     │
+└─────────────────────────────────────────────────────────────┘
 │ 4. Returns results (sent/failed counts)                     │
 └─────────────────────────────────────────────────────────────┘
                             ↓
@@ -69,34 +77,41 @@ This system enables administrators to view attendance reports for completed even
 
 ## 🚀 Setup Guide (One-Time Configuration)
 
-### **Part 1: Google Apps Script Setup (30 minutes)**
+### **Prerequisites**
 
-#### Step 1: Create Google Sheet for Configuration
+Before starting, complete the database migration:
+```bash
+# Run in Supabase SQL Editor or via CLI
+# File: supabase/migrations/003_certificate_templates.sql
+```
+
+This creates the `certificate_templates` table and seeds your default template configuration.
+
+**⚠️ UPDATE YOUR TEMPLATE ID:** Edit the migration file to replace `1__fQ2Nt-FlBzb0xsabGEZRm0HxhVLBlN0JqorT3msnY` with your actual Google Slides template ID before running!
+
+---
+
+### **Part 1: Google Apps Script Setup (20 minutes)**
+
+#### Step 1: Create Google Sheet for Logs (Optional but Recommended)
 
 1. Open Google Sheets (using your .edu account for unlimited emails)
 2. Create a new spreadsheet: "AATCC Certificate System"
-3. Create 4 sheets with these exact names:
+3. Create 3 sheets for monitoring (Config sheet no longer needed!):
 
-**Sheet 1: "Config"**
-```
-| Event ID | Certificate Template ID | Email Subject | Email Body Doc ID |
-|----------|------------------------|---------------|-------------------|
-| (event UUID from database) | (Google Slides ID) | (subject text) | (Google Docs ID) |
-```
-
-**Sheet 2: "Logs"**
+**Sheet 1: "Logs"**
 ```
 | Timestamp | API Key | Event ID | Event Name | Attendee Count | Status |
 |-----------|---------|----------|------------|----------------|--------|
 ```
 
-**Sheet 3: "Security"**
+**Sheet 2: "Security"**
 ```
 | Timestamp | Origin | API Key | Alert Type |
 |-----------|--------|---------|------------|
 ```
 
-**Sheet 4: "Errors"**
+**Sheet 3: "Errors"**
 ```
 | Timestamp | Function Name | Error Message | Stack Trace |
 |-----------|--------------|---------------|-------------|

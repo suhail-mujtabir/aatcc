@@ -104,7 +104,33 @@ export async function POST(
       );
     }
 
-    // 6. Format and validate attendee data
+    // 6. Fetch default certificate template from database
+    const { data: template, error: templateError } = await supabase
+      .from('certificate_templates')
+      .select('slides_template_id, email_subject_template, email_body_doc_id')
+      .eq('is_default', true)
+      .single();
+
+    if (templateError || !template) {
+      console.error('[Send Certificates] Template not found:', templateError);
+      return NextResponse.json(
+        { 
+          error: 'Certificate template not configured',
+          details: 'No default certificate template found. Please configure a template in the database.',
+          hint: 'Run migration 003_certificate_templates.sql and update with your template IDs'
+        },
+        { status: 503 }
+      );
+    }
+
+    console.log(`[Send Certificates] Using template: ${template.slides_template_id}`);
+
+    // 7. Prepare email subject with event name interpolation
+    const emailSubject = template.email_subject_template
+      .replace(/\{\{event\}\}/g, event.name)
+      .replace(/\{\{eventName\}\}/g, event.name);
+
+    // 8. Format and validate attendee data
     const attendees = attendance
       .map((a: any) => ({
         name: a.students.name?.trim(),
@@ -123,7 +149,7 @@ export async function POST(
 
     console.log(`[Send Certificates] Processing ${attendees.length} certificates for event: ${event.name}`);
 
-    // 7. Call Google Apps Script webhook with timeout
+    // 9. Call Google Apps Script webhook with timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
@@ -139,6 +165,16 @@ export async function POST(
           eventName: event.name,
           eventDate: event.start_time,
           attendees: attendees,
+          
+          // Certificate configuration (eliminates need for Google Sheets Config)
+          certificateConfig: {
+            slidesTemplateId: template.slides_template_id,
+            emailSubject: emailSubject,
+            emailBodyDocId: template.email_body_doc_id || null,
+            // Inline HTML body if no doc ID specified
+            emailBodyHtml: template.email_body_doc_id ? null : generateDefaultEmailBody(event.name)
+          },
+          
           origin: request.headers.get('origin') || 'https://aatcc.vercel.app',
           timestamp: new Date().toISOString()
         }),
@@ -147,7 +183,7 @@ export async function POST(
 
       clearTimeout(timeoutId);
 
-      // 8. Parse webhook response
+      // 10. Parse webhook response
       if (!webhookResponse.ok) {
         const errorText = await webhookResponse.text();
         console.error('[Send Certificates] Webhook error:', {
@@ -178,7 +214,7 @@ export async function POST(
         );
       }
 
-      // 9. Log success
+      // 11. Log success
       console.log(`[Send Certificates] Success:`, {
         event: event.name,
         sent: result.sent,
@@ -186,7 +222,7 @@ export async function POST(
         total: attendees.length
       });
 
-      // 10. Return detailed results
+      // 12. Return detailed results
       return NextResponse.json({
         success: true,
         message: `Successfully sent ${result.sent} certificate${result.sent !== 1 ? 's' : ''}`,
@@ -234,3 +270,46 @@ export async function POST(
 
 // Allow longer execution time for certificate processing
 export const maxDuration = 300; // 5 minutes (requires Vercel Pro, defaults to 10s on free tier)
+
+/**
+ * Generate default email body HTML template
+ * Used when no custom email template document is configured
+ */
+function generateDefaultEmailBody(eventName: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+          .footer { margin-top: 30px; padding-top: 20px; border-top: 2px solid #e0e0e0; font-size: 12px; color: #666; }
+          .button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+          strong { color: #667eea; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>🎉 Congratulations!</h1>
+        </div>
+        <div class="content">
+          <p>Dear <strong>{{name}}</strong>,</p>
+          
+          <p>We are thrilled to inform you that you have successfully completed <strong>${eventName}</strong>!</p>
+          
+          <p>Your certificate of completion is attached to this email. This certificate recognizes your participation and commitment to learning and growth.</p>
+          
+          <p>Thank you for being an active member of the AATCC AUST Student Chapter. We look forward to seeing you at future events!</p>
+          
+          <div class="footer">
+            <p><strong>Best regards,</strong><br>
+            AATCC AUST Student Chapter</p>
+            <p style="margin-top: 10px;">Student ID: <strong>{{studentId}}</strong></p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+}
