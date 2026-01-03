@@ -11,6 +11,7 @@ export default function ImportStudentsPage() {
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState<{
     success: number;
+    skipped?: number;
     errors: string[];
   } | null>(null);
   const router = useRouter();
@@ -111,9 +112,9 @@ export default function ImportStudentsPage() {
               </div>
             </div>
             <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
-              <li>• Required columns: student_id, name, pass</li>
-              <li>• Optional column: email</li>
+              <li>• Required columns: student_id, name, pass, email</li>
               <li>• Student ID format: YY-SS-NNN (e.g., 23-01-002)</li>
+              <li>• Email must be in valid format (e.g., student@example.com)</li>
               <li>• Passwords will be securely hashed</li>
               <li>• Maximum 1000 students per upload</li>
             </ul>
@@ -146,38 +147,66 @@ export default function ImportStudentsPage() {
           </form>
 
           {result && (
-            <div className={`mt-6 p-4 rounded-lg ${
+            <div className={`mt-6 p-4 rounded-lg border-2 ${
               result.errors.length === 0
-                ? 'bg-green-50 dark:bg-green-900/20'
-                : 'bg-yellow-50 dark:bg-yellow-900/20'
+                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                : result.success > 0
+                ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
+                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
             }`}>
-              <h3 className={`font-medium ${
+              <h3 className={`font-medium text-lg ${
                 result.errors.length === 0
                   ? 'text-green-800 dark:text-green-200'
-                  : 'text-yellow-800 dark:text-yellow-200'
+                  : result.success > 0
+                  ? 'text-yellow-800 dark:text-yellow-200'
+                  : 'text-red-800 dark:text-red-200'
               }`}>
                 Import Results
               </h3>
-              <p className={`mt-2 text-sm ${
-                result.errors.length === 0
-                  ? 'text-green-700 dark:text-green-300'
-                  : 'text-yellow-700 dark:text-yellow-300'
-              }`}>
-                Successfully imported: {result.success} students
-              </p>
+              
+              <div className="mt-3 space-y-2">
+                <p className={`text-sm font-medium ${
+                  result.errors.length === 0
+                    ? 'text-green-700 dark:text-green-300'
+                    : result.success > 0
+                    ? 'text-yellow-700 dark:text-yellow-300'
+                    : 'text-red-700 dark:text-red-300'
+                }`}>
+                  ✓ Successfully imported: <span className="font-bold">{result.success}</span> students
+                </p>
+                
+                {result.skipped !== undefined && result.skipped > 0 && (
+                  <p className="text-sm font-medium text-orange-700 dark:text-orange-300">
+                    ⊘ Skipped duplicates: <span className="font-bold">{result.skipped}</span> students
+                  </p>
+                )}
+              </div>
+
               {result.errors.length > 0 && (
                 <div className="mt-4">
-                  <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                    Errors ({result.errors.length}):
+                  <p className={`text-sm font-medium ${
+                    result.success > 0
+                      ? 'text-yellow-800 dark:text-yellow-200'
+                      : 'text-red-800 dark:text-red-200'
+                  }`}>
+                    ✗ Issues ({result.errors.length}):
                   </p>
-                  <ul className="mt-2 text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
-                    {result.errors.slice(0, 10).map((error, index) => (
-                      <li key={index}>• {error}</li>
-                    ))}
-                    {result.errors.length > 10 && (
-                      <li>• ... and {result.errors.length - 10} more errors</li>
-                    )}
-                  </ul>
+                  <div className="mt-2 max-h-60 overflow-y-auto bg-white dark:bg-gray-900 rounded-md p-3 border border-gray-200 dark:border-gray-700">
+                    <ul className={`text-sm space-y-1 ${
+                      result.success > 0
+                        ? 'text-yellow-700 dark:text-yellow-300'
+                        : 'text-red-700 dark:text-red-300'
+                    }`}>
+                      {result.errors.map((error, index) => (
+                        <li key={index} className="font-mono">• {error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  {result.success === 0 && (
+                    <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                      Tip: Fix the issues in your CSV file and try uploading again
+                    </p>
+                  )}
                 </div>
               )}
             </div>

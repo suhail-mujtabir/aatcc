@@ -9,7 +9,7 @@ interface CSVRow {
   student_id: string;
   name: string;
   pass: string;
-  email?: string;
+  email: string;
 }
 
 /**
@@ -94,8 +94,8 @@ export async function POST(request: NextRequest) {
       const lineNum = i + 2; // +2 because: +1 for header, +1 for 0-index
 
       // Validate required fields
-      if (!row.student_id || !row.name || !row.pass) {
-        errors.push(`Line ${lineNum}: Missing required fields (student_id, name, pass)`);
+      if (!row.student_id || !row.name || !row.pass || !row.email) {
+        errors.push(`Line ${lineNum}: Missing required fields (student_id, name, pass, email)`);
         continue;
       }
 
@@ -103,11 +103,18 @@ export async function POST(request: NextRequest) {
       row.student_id = row.student_id.trim();
       row.name = row.name.trim();
       row.pass = row.pass.trim();
-      if (row.email) row.email = row.email.trim();
+      row.email = row.email.trim();
 
       // Basic validation
-      if (row.student_id.length === 0 || row.name.length === 0 || row.pass.length === 0) {
+      if (row.student_id.length === 0 || row.name.length === 0 || row.pass.length === 0 || row.email.length === 0) {
         errors.push(`Line ${lineNum}: Empty values after trimming`);
+        continue;
+      }
+
+      // Email format validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(row.email)) {
+        errors.push(`Line ${lineNum}: Invalid email format`);
         continue;
       }
 
@@ -121,18 +128,60 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // OPTIMIZATION: Hash all passwords in batches (15 concurrent, cost factor 8)
-    console.log(`🔐 Hashing ${validRows.length} passwords...`);
+    // Check for existing student IDs in database
+    console.log(`🔍 Checking for duplicate student IDs...`);
+    const supabase = createAdminClient();
+    const studentIds = validRows.map(row => row.student_id);
+    
+    const { data: existingStudents, error: lookupError } = await supabase
+      .from('students')
+      .select('student_id')
+      .in('student_id', studentIds);
+    
+    if (lookupError) {
+      console.error('Duplicate check error:', lookupError);
+      return NextResponse.json(
+        { error: 'Failed to check for duplicates', details: lookupError.message },
+        { status: 500 }
+      );
+    }
+
+    // Identify duplicates and separate new students
+    const existingIds = new Set(existingStudents?.map(s => s.student_id) || []);
+    const newRows: CSVRow[] = [];
+    const duplicateCount = existingIds.size;
+
+    validRows.forEach((row, index) => {
+      const lineNum = index + 2;
+      if (existingIds.has(row.student_id)) {
+        errors.push(`Line ${lineNum}: Student ID '${row.student_id}' already exists in database`);
+      } else {
+        newRows.push(row);
+      }
+    });
+
+    console.log(`✅ Found ${duplicateCount} duplicates, ${newRows.length} new students`);
+
+    if (newRows.length === 0) {
+      return NextResponse.json({
+        success: 0,
+        skipped: duplicateCount,
+        errors: [...errors, 'All student IDs already exist in database']
+      }, { status: 400 });
+    }
+
+    // OPTIMIZATION: Hash only NEW students' passwords (15 concurrent, cost factor 8)
+    console.log(`🔐 Hashing ${newRows.length} passwords (skipped ${duplicateCount} duplicates)...`);
     const startHash = Date.now();
-    const passwords = validRows.map(row => row.pass);
+    const passwords = newRows.map(row => row.pass);
     const hashedPasswords = await hashPasswordsBatch(passwords);
     console.log(`✅ Hashing completed in ${Date.now() - startHash}ms`);
 
-    // Prepare bulk insert data
-    const studentsData = validRows.map((row, index) => ({
+    // Prepare bulk insert data (only new students)
+    const studentsData = newRows.map((row, index) => ({
       student_id: row.student_id,
       name: row.name,
-      email: row.email || null,
+      email: row.email,
       password_hash: hashedPasswords[index],
       card_uid: null,
       bio: ''
@@ -141,7 +190,6 @@ export async function POST(request: NextRequest) {
     // OPTIMIZATION: Single bulk INSERT using Supabase admin client
     console.log(`💾 Inserting ${studentsData.length} students into database...`);
     const startInsert = Date.now();
-    const supabase = createAdminClient();
     
     const { data, error } = await supabase
       .from('students')
@@ -151,28 +199,18 @@ export async function POST(request: NextRequest) {
     console.log(`✅ Database insert completed in ${Date.now() - startInsert}ms`);
 
     if (error) {
-      // Handle duplicate student_id errors
-      if (error.code === '23505') { // Postgres unique violation code
-        errors.push('Some student IDs already exist in database');
-        
-        // Return partial success
-        return NextResponse.json({
-          success: 0,
-          errors: [...errors, 'Duplicate student IDs found. Please remove duplicates and try again.']
-        }, { status: 400 });
-      } else {
-        console.error('Bulk insert error:', error);
-        return NextResponse.json(
-          { error: 'Database error during import', details: error.message },
-          { status: 500 }
-        );
-      }
+      console.error('Bulk insert error:', error);
+      return NextResponse.json(
+        { error: 'Database error during import', details: error.message },
+        { status: 500 }
+      );
     }
 
-    console.log(`🎉 Import completed: ${data?.length || 0} students added successfully`);
+    console.log(`🎉 Import completed: ${data?.length || 0} students added, ${duplicateCount} skipped`);
 
     return NextResponse.json({
       success: data?.length || 0,
+      skipped: duplicateCount,
       errors
     });
 
