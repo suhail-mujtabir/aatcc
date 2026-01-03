@@ -17,7 +17,7 @@ import { verifyDeviceAuth } from '@/lib/device-auth';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Verify device authentication
   const authError = verifyDeviceAuth(request);
@@ -26,7 +26,8 @@ export async function GET(
   }
 
   try {
-    const eventId = params.id;
+    // Await params (Next.js 15 requirement)
+    const { id: eventId } = await params;
 
     // Validate event ID format (UUID)
     if (!eventId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(eventId)) {
