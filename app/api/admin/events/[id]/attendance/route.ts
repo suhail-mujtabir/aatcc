@@ -48,12 +48,13 @@ export async function GET(
       );
     }
 
-    // 2. Fetch attendance records with student details
+    // 2. Fetch attendance records with student details and certificate status
     const { data: attendance, error: attendanceError } = await supabase
       .from('attendance')
       .select(`
         id,
         checked_in_at,
+        certificates_sent_at,
         students (
           id,
           student_id,
@@ -75,14 +76,19 @@ export async function GET(
       );
     }
 
-    // 3. Format response
+    // 3. Format response with certificate status
     const attendees = (attendance || []).map((record: any) => ({
       id: record.id,
       studentId: record.students.student_id,
       name: record.students.name,
       email: record.students.email || null,
-      checkedInAt: record.checked_in_at
+      checkedInAt: record.checked_in_at,
+      certificateSent: !!record.certificates_sent_at,
+      certificateSentAt: record.certificates_sent_at || null
     }));
+
+    // Count certificates sent
+    const certificatesSent = attendees.filter(a => a.certificateSent).length;
 
     // 4. Return data
     return NextResponse.json({
@@ -95,7 +101,9 @@ export async function GET(
         status: event.status
       },
       attendees,
-      totalAttendees: attendees.length
+      totalAttendees: attendees.length,
+      certificatesSent,
+      certificatesPending: attendees.length - certificatesSent
     });
 
   } catch (error) {

@@ -34,6 +34,10 @@ export async function POST(
     await requireAdmin();
 
     const { id: eventId } = await params;
+    
+    // Check if force resend is requested
+    const { searchParams } = new URL(request.url);
+    const forceResend = searchParams.get('force') === 'true';
 
     // 2. Verify webhook configuration
     if (!GOOGLE_APPS_SCRIPT_URL || !GOOGLE_APPS_SCRIPT_KEY) {
@@ -75,12 +79,15 @@ export async function POST(
       );
     }
 
-    // 5. Get all attendees with email addresses
+    // 5. Get all attendees with email addresses and certificate status
     const { data: attendance, error: attendanceError } = await supabase
       .from('attendance')
       .select(`
+        id,
         checked_in_at,
+        certificates_sent_at,
         students!inner (
+          id,
           name,
           email,
           student_id
@@ -101,6 +108,23 @@ export async function POST(
       return NextResponse.json(
         { error: 'No attendees with email addresses found for this event' },
         { status: 404 }
+      );
+    }
+
+    // Filter out attendees who already received certificates (unless force resend)
+    const pendingAttendance = forceResend 
+      ? attendance 
+      : attendance.filter((a: any) => !a.certificates_sent_at);
+
+    if (pendingAttendance.length === 0) {
+      const alreadySentCount = attendance.length;
+      return NextResponse.json(
+        { 
+          error: 'All attendees have already received certificates',
+          details: `${alreadySentCount} certificate${alreadySentCount !== 1 ? 's' : ''} already sent. Use force resend if you need to send again.`,
+          alreadySent: alreadySentCount
+        },
+        { status: 409 }
       );
     }
 
@@ -131,8 +155,10 @@ export async function POST(
       .replace(/\{\{eventName\}\}/g, event.name);
 
     // 8. Format and validate attendee data
-    const attendees = attendance
+    const attendees = pendingAttendance
       .map((a: any) => ({
+        attendanceId: a.id, // Track for updating sent status
+        studentDbId: a.students.id,
         name: a.students.name?.trim(),
         email: a.students.email?.toLowerCase().trim(),
         studentId: a.students.student_id,
@@ -214,15 +240,39 @@ export async function POST(
         );
       }
 
-      // 11. Log success
+      // 11. Update database: Mark certificates as sent for successful attendees
+      const successfulAttendanceIds = result.details
+        .filter((d: any) => d.status === 'sent')
+        .map((d: any) => {
+          const attendee = attendees.find(a => a.email === d.email);
+          return attendee?.attendanceId;
+        })
+        .filter(Boolean);
+
+      if (successfulAttendanceIds.length > 0) {
+        const { error: updateError } = await supabase
+          .from('attendance')
+          .update({ certificates_sent_at: new Date().toISOString() })
+          .in('id', successfulAttendanceIds);
+
+        if (updateError) {
+          console.error('[Send Certificates] Failed to update sent status:', updateError);
+          // Don't fail the request, certificates were sent successfully
+        } else {
+          console.log(`[Send Certificates] Updated ${successfulAttendanceIds.length} attendance records`);
+        }
+      }
+
+      // 12. Log success
       console.log(`[Send Certificates] Success:`, {
         event: event.name,
         sent: result.sent,
         failed: result.failed,
-        total: attendees.length
+        total: attendees.length,
+        forceResend: forceResend
       });
 
-      // 12. Return detailed results
+      // 13. Return detailed results
       return NextResponse.json({
         success: true,
         message: `Successfully sent ${result.sent} certificate${result.sent !== 1 ? 's' : ''}`,

@@ -32,7 +32,7 @@ const API_KEYS = {
  */
 const ALLOWED_ORIGINS = [
   'https://aatcc.vercel.app',
-  'https://your-custom-domain.com',
+  'https://aatccaust.org',
   'http://localhost:3000' // Remove in production
 ];
 
@@ -49,7 +49,7 @@ const RATE_LIMIT = {
  */
 const EMAIL_CONFIG = {
   senderName: 'AATCC AUST Student Chapter',
-  replyTo: 'aatcc@aust.edu', // Your chapter email
+  replyTo: 'austaatcc@aust.edu', // Your chapter email
   // Gmail daily limit: 100 for regular, 1500 for .edu accounts
   maxEmailsPerMinute: 50 // Stay under limit with buffer
 };

@@ -23,6 +23,8 @@ interface Attendee {
   name: string;
   email: string | null;
   checkedInAt: string;
+  certificateSent: boolean;
+  certificateSentAt: string | null;
 }
 
 interface EventData {
@@ -36,6 +38,8 @@ interface EventData {
   };
   attendees: Attendee[];
   totalAttendees: number;
+  certificatesSent: number;
+  certificatesPending: number;
 }
 
 export default function EventReportPage({ params }: { params: Promise<{ id: string }> }) {
@@ -60,8 +64,23 @@ export default function EventReportPage({ params }: { params: Promise<{ id: stri
   });
 
   // Send certificates mutation
-  const handleSendCertificates = async () => {
-    if (!confirm(`Send certificates to ${data?.totalAttendees} attendees?`)) {
+  const handleSendCertificates = async (forceResend: boolean = false) => {
+    const pendingCount = data?.certificatesPending || 0;
+    const alreadySentCount = data?.certificatesSent || 0;
+    
+    // Confirmation dialog based on action
+    let confirmMessage = '';
+    if (forceResend) {
+      confirmMessage = `⚠️ RESEND CERTIFICATES\n\nThis will resend certificates to ALL ${data?.totalAttendees} attendees, including ${alreadySentCount} who already received them.\n\nAre you absolutely sure?`;
+    } else {
+      if (pendingCount === 0) {
+        alert('All attendees have already received certificates. Use "Resend All" if you need to send again.');
+        return;
+      }
+      confirmMessage = `Send certificates to ${pendingCount} attendee${pendingCount !== 1 ? 's' : ''} who haven't received them yet?`;
+    }
+    
+    if (!confirm(confirmMessage)) {
       return;
     }
 
@@ -69,7 +88,8 @@ export default function EventReportPage({ params }: { params: Promise<{ id: stri
     setSendResult(null);
 
     try {
-      const res = await fetch(`/api/admin/events/${eventId}/send-certificates`, {
+      const url = `/api/admin/events/${eventId}/send-certificates${forceResend ? '?force=true' : ''}`;
+      const res = await fetch(url, {
         method: 'POST',
       });
 
@@ -82,6 +102,8 @@ export default function EventReportPage({ params }: { params: Promise<{ id: stri
           sent: result.results.sent,
           failed: result.results.failed,
         });
+        // Refetch data to update certificate status
+        queryClient.invalidateQueries({ queryKey: ['event-attendance', eventId] });
       } else {
         setSendResult({
           type: 'error',
@@ -202,9 +224,28 @@ export default function EventReportPage({ params }: { params: Promise<{ id: stri
 
             {/* Actions */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-6 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Actions
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Actions
+                </h2>
+                {/* Certificate Status Badge */}
+                {data.certificatesSent > 0 && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Certificates:
+                    </span>
+                    <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded">
+                      {data.certificatesSent} sent
+                    </span>
+                    {data.certificatesPending > 0 && (
+                      <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded">
+                        {data.certificatesPending} pending
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+              
               <div className="flex flex-wrap gap-4">
                 {/* Download CSV Button */}
                 <button
@@ -217,8 +258,8 @@ export default function EventReportPage({ params }: { params: Promise<{ id: stri
 
                 {/* Send Certificates Button */}
                 <button
-                  onClick={handleSendCertificates}
-                  disabled={isSending || attendeesWithEmail === 0}
+                  onClick={() => handleSendCertificates(false)}
+                  disabled={isSending || attendeesWithEmail === 0 || data.certificatesPending === 0}
                   className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   {isSending ? (
@@ -229,10 +270,34 @@ export default function EventReportPage({ params }: { params: Promise<{ id: stri
                   ) : (
                     <>
                       <Mail className="h-4 w-4 mr-2" />
-                      Send Certificates ({attendeesWithEmail})
+                      {data.certificatesPending === 0 
+                        ? 'All Sent ✓'
+                        : `Send Certificates (${data.certificatesPending})`
+                      }
                     </>
                   )}
                 </button>
+
+                {/* Resend All Button - Only show if some certificates were already sent */}
+                {data.certificatesSent > 0 && (
+                  <button
+                    onClick={() => handleSendCertificates(true)}
+                    disabled={isSending || attendeesWithEmail === 0}
+                    className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed border-2 border-orange-700"
+                  >
+                    {isSending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Resending...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="h-4 w-4 mr-2" />
+                        Resend All ({attendeesWithEmail})
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
 
               {/* Email Warning */}
@@ -311,6 +376,9 @@ export default function EventReportPage({ params }: { params: Promise<{ id: stri
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Checked In
                       </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Certificate
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -332,6 +400,19 @@ export default function EventReportPage({ params }: { params: Promise<{ id: stri
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                           {formatDate(attendee.checkedInAt)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {attendee.certificateSent ? (
+                            <div className="flex items-center text-green-600 dark:text-green-400">
+                              <CheckCircle className="h-4 w-4 mr-1" />
+                              <span className="text-xs font-medium">Sent</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center text-gray-400 dark:text-gray-600">
+                              <Clock className="h-4 w-4 mr-1" />
+                              <span className="text-xs">Pending</span>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     ))}
