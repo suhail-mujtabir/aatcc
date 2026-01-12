@@ -23,7 +23,7 @@ Disallow: /static/
 Disallow: /login
 
 # Sitemap location
-Sitemap: https://aatcc.vercel.app/sitemap.xml
+Sitemap: https://www.aatccaust.org/sitemap.xml
 
 # Crawl-delay (be nice to servers) - optional
 # Crawl-delay: 1

@@ -21,7 +21,7 @@ export const viewport: Viewport = {
 
 // SEO & Open Graph Metadata
 export const metadata: Metadata = {
-  metadataBase: new URL('https://aatcc.vercel.app'),
+  metadataBase: new URL('https://www.aatccaust.org'),
   
   title: {
     default: "AATCC AUST Student Chapter | First International Chapter in Bangladesh",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://aatcc.vercel.app",
+    url: "https://www.aatccaust.org",
     siteName: "AATCC AUST Student Chapter",
     title: "AATCC AUST Student Chapter | First International Chapter in Bangladesh",
     description: "The first international AATCC Student Chapter in Bangladesh for textile engineering students at Ahsanullah University of Science and Technology.",
