@@ -54,7 +54,7 @@
         "Networking"
       ],
       "readTime": "6 min",
-      "featured": false,
+      "featured": true,
       "contentFile": "textile-focus-partnership.html"
     },
     {
@@ -100,7 +100,7 @@
   "author": "AATCC Team",
   "tags": ["Awards", "AATCC", "Leadership", "AUST", "Student Excellence", "Textile Science"],
   "readTime": "5 min",
-  "featured": true,
+  "featured": false,
   "contentFile": "abir-aatcc-award-article.html"
 },
 {
@@ -135,7 +135,7 @@
   "title": "Spring 25: AATCC AUST Student Chapter Completes Successful General Member Recruitment",
   "excerpt": "Day 1 and Day 2 of recruitment witnessed exceptional enthusiasm as passionate students joined AATCC AUST Student Chapter. Doors remain open until December 23rd for aspiring members to join this vibrant community.",
   "image": "https://i.imgur.com/MDvzwUK.jpeg",
-  "date": "2025-12-16",
+  "date": "2025-12-18",
   "author": "AATCC Team",
   "tags": ["Events", "AATCC", "AUST", "Recruitment", "Student Chapter", "Textile Sciences"],
   "readTime": "5 min",
@@ -148,7 +148,7 @@
   "title": "AATCC AUST Joins Road to Champion Season-05 as Official Club Partner",
   "excerpt": "Textile Engineers Society announces strategic partnership with AATCC AUST Student Chapter for Road to Champion Season-05, creating enhanced opportunities for textile students.",
   "image": "https://i.imgur.com/NK1roIR.jpeg",
-  "date": "2025-01-16",
+  "date": "2025-12-27",
   "author": "AATCC Team",
   "tags": ["Partnership", "AATCC", "AUST", "Road to Champion", "Textile Engineers Society", "Competition"],
   "readTime": "5 min",
