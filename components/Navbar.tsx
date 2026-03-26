@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
 
 const NAV_ITEMS = [
   { id: "about", label: "About", page: "/about" },
@@ -31,11 +30,9 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const pathname = usePathname();
-  const { user, loading } = useAuth();
 
   const isHome = pathname === "/";
   const isDashboard = pathname.startsWith("/dashboard");
-  const isLoginPage = pathname === "/login";
   const isAbout = pathname === "/about";
 
   // Pages that should have transparent navbar initially
@@ -77,10 +74,6 @@ export default function Navbar() {
     setActiveDropdown(activeDropdown === id ? null : id);
   };
 
-  if (isLoginPage) {
-    return null;
-  }
-
   return (
     <>
       <motion.nav
@@ -99,13 +92,15 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between text-white">
           {/* LOGO + TITLE */}
-          <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group flex-shrink-0">
+          <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group flex-shrink-0" prefetch={false}>
             <Image
               src="/logo.png"
               alt="AATCC Logo"
               width={40}
               height={40}
               className="rounded-md transition-transform duration-300 group-hover:scale-105 w-8 h-8 sm:w-10 sm:h-10"
+              priority
+              quality={90}
             />
             <span className="hidden sm:inline text-lg font-bold tracking-wide hover:text-green-400 transition-colors duration-500 whitespace-nowrap">
               AATCC AUST Student Chapter
@@ -120,6 +115,7 @@ export default function Navbar() {
                   <Link
                     href={it.page}
                     className="px-1 py-1 text-white font-medium block"
+                    prefetch={false}
                   >
                     <span className="relative z-10 transition-colors duration-500 group-hover:text-green-400 text-sm xl:text-base">
                       {it.label}
@@ -139,6 +135,7 @@ export default function Navbar() {
                           <Link
                             href={child.page}
                             className="block px-4 py-3 text-white hover:bg-green-600 transition-colors duration-200 text-sm"
+                            prefetch={false}
                           >
                             {child.label}
                           </Link>
@@ -151,53 +148,79 @@ export default function Navbar() {
             ))}
             <li><SnowToggle /></li>
             <li><ThemeToggle /></li>
-          </ul>
-
-          {/* AUTH BUTTONS - Desktop */}
-          <div className="hidden lg:block pl-4 flex-shrink-0">
-            {loading ? (
-              <div className="h-9 w-24 bg-gray-700/50 rounded-lg"></div>
-            ) : user ? (
-              <Link
-                href="/dashboard"
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 text-sm"
-              >
-                Dashboard
-              </Link>
-            ) : (
+            <li>
               <Link
                 href="/login"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 text-sm"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-green-600 dark:hover:bg-green-500 transition-colors duration-300"
+                aria-label="Student Login"
+                prefetch={false}
               >
-                Login
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
               </Link>
-            )}
-          </div>
+            </li>
+          </ul>
 
-          {/* MOBILE MENU BUTTON */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-800/50 transition-colors duration-200"
-            aria-label="Toggle menu"
-          >
-            <div className="w-6 h-6 flex flex-col justify-center space-y-1">
-              <span
-                className={`block h-0.5 bg-white transition-all duration-300 ${
-                  mobileMenuOpen ? "rotate-45 translate-y-1.5" : ""
-                }`}
-              />
-              <span
-                className={`block h-0.5 bg-white transition-all duration-300 ${
-                  mobileMenuOpen ? "opacity-0" : "opacity-100"
-                }`}
-              />
-              <span
-                className={`block h-0.5 bg-white transition-all duration-300 ${
-                  mobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
-                }`}
-              />
-            </div>
-          </button>
+          {/* MOBILE CONTROLS */}
+          <div className="lg:hidden flex items-center space-x-3">
+            <Link
+              href="/login"
+              className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-700 dark:bg-gray-300 hover:bg-green-600 dark:hover:bg-green-500 transition-colors duration-300"
+              aria-label="Student Login"
+              prefetch={false}
+            >
+              <svg
+                className="w-5 h-5 text-white dark:text-gray-900"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            </Link>
+            
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg hover:bg-gray-800/50 transition-colors duration-200"
+              aria-label="Toggle menu"
+            >
+              <div className="w-6 h-6 flex flex-col justify-center space-y-1">
+                <span
+                  className={`block h-0.5 bg-white transition-all duration-300 ${
+                    mobileMenuOpen ? "rotate-45 translate-y-1.5" : ""
+                  }`}
+                />
+                <span
+                  className={`block h-0.5 bg-white transition-all duration-300 ${
+                    mobileMenuOpen ? "opacity-0" : "opacity-100"
+                  }`}
+                />
+                <span
+                  className={`block h-0.5 bg-white transition-all duration-300 ${
+                    mobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+                  }`}
+                />
+              </div>
+            </button>
+          </div>
         </div>
 
         {/* MOBILE MENU OVERLAY */}
@@ -257,6 +280,7 @@ export default function Navbar() {
                                       href={child.page}
                                       className="block py-2 text-gray-300 hover:text-green-400 transition-colors duration-200"
                                       onClick={() => setMobileMenuOpen(false)}
+                                      prefetch={false}
                                     >
                                       {child.label}
                                     </Link>
@@ -271,6 +295,7 @@ export default function Navbar() {
                           href={item.page}
                           className="block py-3 text-white font-medium text-lg hover:text-green-400 transition-colors duration-200"
                           onClick={() => setMobileMenuOpen(false)}
+                          prefetch={false}
                         >
                           {item.label}
                         </Link>
@@ -284,25 +309,6 @@ export default function Navbar() {
                       <SnowToggle />
                       <ThemeToggle />
                     </div>
-                    {loading ? (
-                      <div className="h-12 bg-gray-700/50 rounded-lg "></div>
-                    ) : user ? (
-                      <Link
-                        href="/dashboard"
-                        className="block w-full bg-green-600 hover:bg-green-700 text-white font-semibold text-center py-3 rounded-lg transition-colors duration-300"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Dashboard
-                      </Link>
-                    ) : (
-                      <Link
-                        href="/login"
-                        className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-center py-3 rounded-lg transition-colors duration-300"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Login
-                      </Link>
-                    )}
                   </div>
                 </div>
               </motion.div>

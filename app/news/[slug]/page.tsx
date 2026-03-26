@@ -95,6 +95,8 @@ export default async function NewsArticlePage({ params }: PageProps) {
             fill
             priority
             className="object-cover"
+            sizes="100vw"
+            quality={85}
           />
           {/* Stronger gradient overlay for better text visibility */}
           <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/80 to-gray-950/40" />

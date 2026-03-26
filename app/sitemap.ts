@@ -2,7 +2,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://aatcc.vercel.app'
+  const baseUrl = 'https://www.aatccaust.org'
   const currentDate = new Date()
 
   return [

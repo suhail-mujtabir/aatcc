@@ -81,6 +81,7 @@ export default function ActivityDetailClient({
             priority
             className="object-cover"
             sizes="100vw"
+            quality={85}
           />
         </div>
       </motion.div>

@@ -148,6 +148,8 @@ function LogoLine({ logos, speed = 30, direction = 'left' }: LogoLineProps) {
                       fill
                       className="object-contain"
                       sizes="(max-width: 768px) 80px, (max-width: 1024px) 100px, 120px"
+                      loading="lazy"
+                      quality={75}
                     />
                   )}
                 </a>
@@ -164,6 +166,8 @@ function LogoLine({ logos, speed = 30, direction = 'left' }: LogoLineProps) {
                       fill
                       className="object-contain"
                       sizes="(max-width: 768px) 80px, (max-width: 1024px) 100px, 120px"
+                      loading="lazy"
+                      quality={75}
                     />
                   )}
                 </div>

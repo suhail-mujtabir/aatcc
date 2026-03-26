@@ -2,7 +2,6 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Navbar from "../components/Navbar";
-import { AuthProvider } from "@/context/AuthContext";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import { ThemeProvider } from '@/context/ThemeContext';
@@ -22,7 +21,7 @@ export const viewport: Viewport = {
 
 // SEO & Open Graph Metadata
 export const metadata: Metadata = {
-  metadataBase: new URL('https://aatcc.vercel.app'),
+  metadataBase: new URL('https://www.aatccaust.org'),
   
   title: {
     default: "AATCC AUST Student Chapter | First International Chapter in Bangladesh",
@@ -59,7 +58,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://aatcc.vercel.app",
+    url: "https://www.aatccaust.org",
     siteName: "AATCC AUST Student Chapter",
     title: "AATCC AUST Student Chapter | First International Chapter in Bangladesh",
     description: "The first international AATCC Student Chapter in Bangladesh for textile engineering students at Ahsanullah University of Science and Technology.",
@@ -179,25 +178,23 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>
-          <AuthProvider>
-            <SnowProvider>
-              <ConditionalClickSpark
-                sparkSize={10}
-                sparkRadius={15}
-                sparkCount={8}
-                duration={400}
-              >
-                <Navbar />
-                <ReactLenis root>
-                  <main className="flex-grow">
-                    {children}
-                  </main>
-                </ReactLenis>
-                <Footer/>
-                <ScrollToTop />
-              </ConditionalClickSpark>
-            </SnowProvider>
-          </AuthProvider>
+          <SnowProvider>
+            <ConditionalClickSpark
+              sparkSize={10}
+              sparkRadius={15}
+              sparkCount={8}
+              duration={400}
+            >
+              <Navbar />
+              <ReactLenis root>
+                <main className="flex-grow">
+                  {children}
+                </main>
+              </ReactLenis>
+              <Footer/>
+              <ScrollToTop />
+            </ConditionalClickSpark>
+          </SnowProvider>
         </ThemeProvider>
       </body>
     </html>

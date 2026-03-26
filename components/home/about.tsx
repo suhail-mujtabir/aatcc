@@ -40,6 +40,7 @@ export default function About() {
             href="/about"
             className="inline-block px-6 py-2.5 sm:px-7 sm:py-3 lg:px-8 font-semibold text-white bg-black/85 rounded-full 
             transform transition-transform duration-300 hover:scale-110 active:scale-95 dark:bg-white dark:text-black"
+            prefetch={false}
           >
             Read More
           </Link>

@@ -17,7 +17,7 @@
         "Textiles"
       ],
       "readTime": "5 min",
-      "featured": true,
+      "featured": false,
       "contentFile": "texposium-10-showcasing-student-innovation.html"
     },
     {
@@ -42,7 +42,7 @@
       "slug": "textile-focus-partnership-inspiration",
       "title": "AATCC AUST Partners with Textile Focus for INSPIRATION",
       "excerpt": "We're excited to announce our Club Partner, the AATCC–AUST Student Chapter, for Textile Focus's Public Speaking Session — INSPIRATION! Their collaboration highlights a shared commitment to empowering voices, fostering dialogue, and inspiring the textile community.",
-      "image": "https://imglink.io/i/9ebcdda2-42a5-49f6-851d-f4531e46dcd8.jpg",
+      "image": "https://i.imgur.com/Ul5RmQu.jpeg",
       "date": "2025-01-10",
       "author": "AATCC Team",
       "tags": [
@@ -54,7 +54,7 @@
         "Networking"
       ],
       "readTime": "6 min",
-      "featured": true,
+      "featured": false,
       "contentFile": "textile-focus-partnership.html"
     },
     {
@@ -78,82 +78,82 @@
       "contentFile": "austex-buft.html"
     },
     {
-  "id": 5,
-  "slug": "aatcc-aust-btemic-mou-partnership-textile-education",
-  "title": "AATCC AUST and BTEMIC Sign Historic MoU for Textile Excellence",
-  "excerpt": "AATCC AUST Student Chapter and BTEMIC formalize strategic partnership on October 28, 2025, creating new opportunities for textile students through joint initiatives and knowledge exchange.",
-  "image": "https://i.imgur.com/Pr5zoCe.jpeg",
-  "date": "2025-10-28",
-  "author": "AATCC Team",
-  "tags": ["Partnership", "MoU", "AATCC", "BTEMIC", "Textile Education", "Collaboration"],
-  "readTime": "5 min",
-  "featured": false,
-  "contentFile": "mou-signing-article.html"
-},
-{
-  "id": 1,
-  "slug": "abir-hossain-honored-aatcc-2025-student-chapter-award",
-  "title": "Abir Hossain Honored in AATCC 2025 Student Chapter Awards",
-  "excerpt": "Former AATCC AUST Chairperson Abir Hossain receives prestigious international recognition for exceptional leadership and dedication to textile science education.",
-  "image": "https://i.imgur.com/tiVYg34.jpeg",
-  "date": "2025-11-30",
-  "author": "AATCC Team",
-  "tags": ["Awards", "AATCC", "Leadership", "AUST", "Student Excellence", "Textile Science"],
-  "readTime": "5 min",
-  "featured": true,
-  "contentFile": "abir-aatcc-award-article.html"
-},
-{
-  "id": 1,
-  "slug": "aatcc-aust-student-chapter-recruitment-2025-welcomes-new-members",
-  "title": "AATCC AUST Student Chapter Recruitment 2025: Welcoming New Textile Enthusiasts",
-  "excerpt": "The AATCC AUST Student Chapter successfully concluded its 2025 recruitment drive with overwhelming response, extending the deadline to March 20th and welcoming a dynamic cohort of textile professionals-in-training.",
-  "image": "https://i.imgur.com/bWBbFkp.jpeg",
-  "date": "2025-03-21",
-  "author": "AATCC Team",
-  "tags": ["Recruitment", "AATCC", "Student Chapter", "AUST", "Textiles", "Community"],
-  "readTime": "6 min",
-  "featured": true,
-  "contentFile": "aatcc-member-recruitment-spring2024.html"
-},
-{
-  "id": 1,
-  "slug": "aatcc-aust-student-chapter-founding-panel-unveiled",
-  "title": "AATCC AUST Student Chapter Founding Panel Unveiled with Vision for Textile Excellence",
-  "excerpt": "AATCC AUST Student Chapter proudly presents its founding panel, pioneering innovation and sustainability in textile education. Under Dr. Mohammad Tajul Islam's guidance, the chapter sets new benchmarks for excellence.",
-  "image": "https://i.imgur.com/0xlrz2R.jpeg",
-  "date": "2024-11-30",
-  "author": "AATCC Team",
-  "tags": ["AATCC", "AUST", "Student Chapter", "Textile Education", "Innovation", "Sustainability"],
-  "readTime": "5 min",
-  "featured": true,
-  "contentFile": "aatcc-founding-panel.html"
-},
-{
-  "id": 1,
-  "slug": "aatcc-aust-student-chapter-general-member-recruitment-success",
-  "title": "AATCC AUST Student Chapter Completes Successful General Member Recruitment",
-  "excerpt": "Day 1 and Day 2 of recruitment witnessed exceptional enthusiasm as passionate students joined AATCC AUST Student Chapter. Doors remain open until December 23rd for aspiring members to join this vibrant community.",
-  "image": "https://i.imgur.com/MDvzwUK.jpeg",
-  "date": "2025-01-16",
-  "author": "AATCC Team",
-  "tags": ["Events", "AATCC", "AUST", "Recruitment", "Student Chapter", "Textile Sciences"],
-  "readTime": "5 min",
-  "featured": true,
-  "contentFile": "aatcc-member-recruitment.html"
-},
-{
-  "id": 2,
-  "slug": "aatcc-aust-partners-textile-engineers-society-road-to-champion-season-05",
-  "title": "AATCC AUST Joins Road to Champion Season-05 as Official Club Partner",
-  "excerpt": "Textile Engineers Society announces strategic partnership with AATCC AUST Student Chapter for Road to Champion Season-05, creating enhanced opportunities for textile students.",
-  "image": "https://i.imgur.com/NK1roIR.jpeg",
-  "date": "2025-01-16",
-  "author": "AATCC Team",
-  "tags": ["Partnership", "AATCC", "AUST", "Road to Champion", "Textile Engineers Society", "Competition"],
-  "readTime": "5 min",
-  "featured": true,
-  "contentFile": "aatcc-tec-road-to-champion-season-05.html"
-}
+      "id": 5,
+      "slug": "aatcc-aust-btemic-mou-partnership-textile-education",
+      "title": "AATCC AUST and BTEMIC Sign Historic MoU for Textile Excellence",
+      "excerpt": "AATCC AUST Student Chapter and BTEMIC formalize strategic partnership on October 28, 2025, creating new opportunities for textile students through joint initiatives and knowledge exchange.",
+      "image": "https://i.imgur.com/Pr5zoCe.jpeg",
+      "date": "2025-10-28",
+      "author": "AATCC Team",
+      "tags": ["Partnership", "MoU", "AATCC", "BTEMIC", "Textile Education", "Collaboration"],
+      "readTime": "5 min",
+      "featured": false,
+      "contentFile": "mou-signing-article.html"
+    },
+    {
+      "id": 6,
+      "slug": "abir-hossain-honored-aatcc-2025-student-chapter-award",
+      "title": "Abir Hossain Honored in AATCC 2025 Student Chapter Awards",
+      "excerpt": "Former AATCC AUST Chairperson Abir Hossain receives prestigious international recognition for exceptional leadership and dedication to textile science education.",
+      "image": "https://i.imgur.com/tiVYg34.jpeg",
+      "date": "2025-11-30",
+      "author": "AATCC Team",
+      "tags": ["Awards", "AATCC", "Leadership", "AUST", "Student Excellence", "Textile Science"],
+      "readTime": "5 min",
+      "featured": true,
+      "contentFile": "abir-aatcc-award-article.html"
+    },
+    {
+      "id": 7,
+      "slug": "aatcc-aust-student-chapter-recruitment-2025-welcomes-new-members",
+      "title": "AATCC AUST Student Chapter Recruitment 2025: Welcoming New Textile Enthusiasts",
+      "excerpt": "The AATCC AUST Student Chapter successfully concluded its 2025 recruitment drive with overwhelming response, extending the deadline to March 20th and welcoming a dynamic cohort of textile professionals-in-training.",
+      "image": "https://i.imgur.com/bWBbFkp.jpeg",
+      "date": "2025-03-21",
+      "author": "AATCC Team",
+      "tags": ["Recruitment", "AATCC", "Student Chapter", "AUST", "Textiles", "Community"],
+      "readTime": "6 min",
+      "featured": false,
+      "contentFile": "aatcc-member-recruitment-spring2024.html"
+    },
+    {
+      "id": 8,
+      "slug": "aatcc-aust-student-chapter-founding-panel-unveiled",
+      "title": "AATCC AUST Student Chapter Founding Panel Unveiled with Vision for Textile Excellence",
+      "excerpt": "AATCC AUST Student Chapter proudly presents its founding panel, pioneering innovation and sustainability in textile education. Under Dr. Mohammad Tajul Islam's guidance, the chapter sets new benchmarks for excellence.",
+      "image": "https://i.imgur.com/0xlrz2R.jpeg",
+      "date": "2024-11-30",
+      "author": "AATCC Team",
+      "tags": ["AATCC", "AUST", "Student Chapter", "Textile Education", "Innovation", "Sustainability"],
+      "readTime": "5 min",
+      "featured": false,
+      "contentFile": "aatcc-founding-panel.html"
+    },
+    {
+      "id": 9,
+      "slug": "aatcc-aust-student-chapter-general-member-recruitment-success",
+      "title": "Spring 25: AATCC AUST Student Chapter Completes Successful General Member Recruitment",
+      "excerpt": "Day 1 and Day 2 of recruitment witnessed exceptional enthusiasm as passionate students joined AATCC AUST Student Chapter. Doors remain open until December 23rd for aspiring members to join this vibrant community.",
+      "image": "https://i.imgur.com/MDvzwUK.jpeg",
+      "date": "2025-12-23",
+      "author": "AATCC Team",
+      "tags": ["Events", "AATCC", "AUST", "Recruitment", "Student Chapter", "Textile Sciences"],
+      "readTime": "5 min",
+      "featured": true,
+      "contentFile": "aatcc-member-recruitment.html"
+    },
+    {
+      "id": 10,
+      "slug": "aatcc-aust-partners-textile-engineers-society-road-to-champion-season-05",
+      "title": "AATCC AUST Joins Road to Champion Season-05 as Official Club Partner",
+      "excerpt": "Textile Engineers Society announces strategic partnership with AATCC AUST Student Chapter for Road to Champion Season-05, creating enhanced opportunities for textile students.",
+      "image": "https://i.imgur.com/NK1roIR.jpeg",
+      "date": "2025-12-27",
+      "author": "AATCC Team",
+      "tags": ["Partnership", "AATCC", "AUST", "Road to Champion", "Textile Engineers Society", "Competition"],
+      "readTime": "5 min",
+      "featured": false,
+      "contentFile": "aatcc-tec-road-to-champion-season-05.html"
+    }
   ]
 }
