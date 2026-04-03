@@ -1,6 +1,8 @@
 // components/home/TestimonialCard.tsx
 "use client";
 
+import { useRouter } from 'next/navigation';
+
 interface Testimonial {
   id: number;
   name: string;
@@ -14,8 +16,10 @@ interface TestimonialCardProps {
 }
 
 export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
+  const router = useRouter();
+
   const handleClick = () => {
-    window.open(testimonial.facebookUrl, '_blank', 'noopener,noreferrer');
+    router.push(`/testimonials?id=${testimonial.id}`);
   };
 
   return (

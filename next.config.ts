@@ -42,6 +42,7 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 31536000, // Cache images for 1 year
     deviceSizes: [640, 750, 828, 1080, 1200], // Reduced device sizes
     imageSizes: [16, 32, 48, 64, 96, 128, 256], // Smaller image sizes
+    qualities: [75, 85, 90], // Configure allowed quality values
   },
   // Redirect from Vercel domain to custom domain
   async redirects() {

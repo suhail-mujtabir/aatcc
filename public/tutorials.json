@@ -1,0 +1,616 @@
+{
+  "plain-weave": {
+    "steps": [
+      {
+        "title": "Plain Weave Basics",
+        "description": "Plain weave is the simplest weave structure. Each warp thread alternates over and under each weft thread.",
+        "highlightType": "none"
+      },
+      {
+        "title": "Warp Threads",
+        "description": "Vertical warp threads form the foundation. Notice how they alternate in the pattern.",
+        "highlightType": "warp",
+        "highlightIndex": 0
+      },
+      {
+        "title": "Weft Threads",
+        "description": "Horizontal weft threads weave through the warp in an alternating pattern.",
+        "highlightType": "weft",
+        "highlightIndex": 0
+      },
+      {
+        "title": "Checkerboard Pattern",
+        "description": "This creates a balanced checkerboard structure. Each intersection alternates between warp (1) and weft (0) on top.",
+        "highlightType": "cells",
+        "highlightCells": [
+          {
+            "row": 0,
+            "col": 0
+          },
+          {
+            "row": 0,
+            "col": 2
+          },
+          {
+            "row": 1,
+            "col": 1
+          },
+          {
+            "row": 1,
+            "col": 3
+          }
+        ]
+      },
+      {
+        "title": "Maximum Interlacement",
+        "description": "Plain weave has the most interlacement points, making it strong and durable. Perfect for shirts, sheets, and canvas.",
+        "highlightType": "none"
+      }
+    ]
+  },
+  "twill-2-2": {
+    "steps": [
+      {
+        "title": "Twill 2/2 Structure",
+        "description": "Twill weaves create diagonal lines. The 2/2 means 2 warp threads up, then 2 down.",
+        "highlightType": "none"
+      },
+      {
+        "title": "Diagonal Line Formation",
+        "description": "Notice the diagonal pattern moving from bottom-left to top-right. Each row shifts the pattern by one thread.",
+        "highlightType": "cells",
+        "highlightCells": [
+          {
+            "row": 0,
+            "col": 0
+          },
+          {
+            "row": 1,
+            "col": 1
+          },
+          {
+            "row": 2,
+            "col": 2
+          },
+          {
+            "row": 3,
+            "col": 3
+          }
+        ]
+      },
+      {
+        "title": "2-Thread Grouping",
+        "description": "Warp threads float over 2 weft threads, creating the characteristic twill diagonal.",
+        "highlightType": "cells",
+        "highlightCells": [
+          {
+            "row": 0,
+            "col": 0
+          },
+          {
+            "row": 0,
+            "col": 1
+          }
+        ]
+      },
+      {
+        "title": "Reversible Pattern",
+        "description": "Twill is reversible - the back shows the opposite pattern. Used in denim, chino, and herringbone fabrics.",
+        "highlightType": "none"
+      }
+    ]
+  },
+  "basket-weave-2x2": {
+    "steps": [
+      {
+        "title": "Basket Weave 2×2",
+        "description": "Basket weave groups multiple threads together, creating a checkerboard of blocks.",
+        "highlightType": "none"
+      },
+      {
+        "title": "2×2 Thread Groups",
+        "description": "Two warp threads act as one unit, passing over or under two weft threads together.",
+        "highlightType": "cells",
+        "highlightCells": [
+          {
+            "row": 0,
+            "col": 0
+          },
+          {
+            "row": 0,
+            "col": 1
+          },
+          {
+            "row": 1,
+            "col": 0
+          },
+          {
+            "row": 1,
+            "col": 1
+          }
+        ]
+      },
+      {
+        "title": "Block Pattern",
+        "description": "This creates distinct 2×2 blocks that alternate like a checkerboard, giving a basket-like texture.",
+        "highlightType": "cells",
+        "highlightCells": [
+          {
+            "row": 0,
+            "col": 0
+          },
+          {
+            "row": 0,
+            "col": 1
+          },
+          {
+            "row": 1,
+            "col": 0
+          },
+          {
+            "row": 1,
+            "col": 1
+          },
+          {
+            "row": 2,
+            "col": 2
+          },
+          {
+            "row": 2,
+            "col": 3
+          },
+          {
+            "row": 3,
+            "col": 2
+          },
+          {
+            "row": 3,
+            "col": 3
+          }
+        ]
+      },
+      {
+        "title": "Loose & Textured",
+        "description": "Basket weave is looser than plain weave, creating a textured fabric. Common in oxford cloth and monk's cloth.",
+        "highlightType": "none"
+      }
+    ]
+  },
+  "satin-5": {
+    "steps": [
+      {
+        "title": "Satin 5-Shaft Weave",
+        "description": "Satin weave features long floats - threads that pass over multiple intersections before interlacing.",
+        "highlightType": "none"
+      },
+      {
+        "title": "Long Float Pattern",
+        "description": "Each warp thread floats over 4 weft threads, creating a smooth, lustrous surface.",
+        "highlightType": "cells",
+        "highlightCells": [
+          {
+            "row": 0,
+            "col": 0
+          },
+          {
+            "row": 1,
+            "col": 0
+          },
+          {
+            "row": 2,
+            "col": 0
+          },
+          {
+            "row": 3,
+            "col": 0
+          },
+          {
+            "row": 4,
+            "col": 0
+          }
+        ]
+      },
+      {
+        "title": "Offset Interlacement",
+        "description": "Interlacement points are staggered to avoid diagonal lines, creating the smooth satin finish.",
+        "highlightType": "cells",
+        "highlightCells": [
+          {
+            "row": 0,
+            "col": 0
+          },
+          {
+            "row": 1,
+            "col": 3
+          },
+          {
+            "row": 2,
+            "col": 1
+          },
+          {
+            "row": 3,
+            "col": 4
+          },
+          {
+            "row": 4,
+            "col": 2
+          }
+        ]
+      },
+      {
+        "title": "Smooth & Lustrous",
+        "description": "The long floats reflect light beautifully, creating satin's signature sheen. Used in formal wear and luxury fabrics.",
+        "highlightType": "none"
+      }
+    ]
+  },
+  "honeycomb": {
+    "steps": [
+      {
+        "title": "Step 1",
+        "description": "Start from bottom left corner of the repeat.",
+        "highlightType": "cells",
+        "highlightCells": [
+          {
+            "row": 11,
+            "col": 0
+          },
+          {
+            "row": 10,
+            "col": 1
+          },
+          {
+            "row": 9,
+            "col": 2
+          },
+          {
+            "row": 8,
+            "col": 3
+          },
+          {
+            "row": 7,
+            "col": 4
+          },
+          {
+            "row": 6,
+            "col": 5
+          },
+          {
+            "row": 5,
+            "col": 6
+          },
+          {
+            "row": 4,
+            "col": 7
+          },
+          {
+            "row": 3,
+            "col": 8
+          },
+          {
+            "row": 2,
+            "col": 9
+          },
+          {
+            "row": 1,
+            "col": 10
+          },
+          {
+            "row": 0,
+            "col": 11
+          }
+        ]
+      },
+      {
+        "title": "Step 2",
+        "description": "Make 2 diagonal lines from left top corner.",
+        "highlightType": "cells",
+        "highlightCells": [
+          {
+            "row": 0,
+            "col": 1
+          },
+          {
+            "row": 1,
+            "col": 2
+          },
+          {
+            "row": 2,
+            "col": 3
+          },
+          {
+            "row": 3,
+            "col": 4
+          },
+          {
+            "row": 4,
+            "col": 5
+          },
+          {
+            "row": 5,
+            "col": 6
+          },
+          {
+            "row": 6,
+            "col": 7
+          },
+          {
+            "row": 7,
+            "col": 8
+          },
+          {
+            "row": 8,
+            "col": 9
+          },
+          {
+            "row": 9,
+            "col": 10
+          },
+          {
+            "row": 10,
+            "col": 11
+          },
+          {
+            "row": 11,
+            "col": 10
+          },
+          {
+            "row": 10,
+            "col": 9
+          },
+          {
+            "row": 9,
+            "col": 8
+          },
+          {
+            "row": 8,
+            "col": 7
+          },
+          {
+            "row": 7,
+            "col": 6
+          },
+          {
+            "row": 6,
+            "col": 5
+          },
+          {
+            "row": 5,
+            "col": 4
+          },
+          {
+            "row": 4,
+            "col": 3
+          },
+          {
+            "row": 3,
+            "col": 2
+          },
+          {
+            "row": 2,
+            "col": 1
+          },
+          {
+            "row": 1,
+            "col": 0
+          }
+        ]
+      },
+      {
+        "title": "Step 3",
+        "description": "make a diamond shape in the cross points.",
+        "highlightType": "cells",
+        "highlightCells": [
+          {
+            "row": 6,
+            "col": 7
+          },
+          {
+            "row": 6,
+            "col": 8
+          },
+          {
+            "row": 6,
+            "col": 9
+          },
+          {
+            "row": 6,
+            "col": 10
+          },
+          {
+            "row": 6,
+            "col": 11
+          },
+          {
+            "row": 7,
+            "col": 8
+          },
+          {
+            "row": 7,
+            "col": 9
+          },
+          {
+            "row": 7,
+            "col": 10
+          },
+          {
+            "row": 8,
+            "col": 9
+          },
+          {
+            "row": 5,
+            "col": 8
+          },
+          {
+            "row": 5,
+            "col": 9
+          },
+          {
+            "row": 5,
+            "col": 10
+          },
+          {
+            "row": 4,
+            "col": 9
+          },
+          {
+            "row": 4,
+            "col": 1
+          },
+          {
+            "row": 4,
+            "col": 2
+          },
+          {
+            "row": 4,
+            "col": 3
+          },
+          {
+            "row": 3,
+            "col": 2
+          },
+          {
+            "row": 5,
+            "col": 3
+          },
+          {
+            "row": 5,
+            "col": 4
+          },
+          {
+            "row": 5,
+            "col": 2
+          },
+          {
+            "row": 5,
+            "col": 1
+          },
+          {
+            "row": 5,
+            "col": 0
+          },
+          {
+            "row": 6,
+            "col": 1
+          },
+          {
+            "row": 6,
+            "col": 2
+          },
+          {
+            "row": 6,
+            "col": 3
+          },
+          {
+            "row": 7,
+            "col": 2
+          },
+          {
+            "row": 9,
+            "col": 8
+          },
+          {
+            "row": 10,
+            "col": 7
+          },
+          {
+            "row": 10,
+            "col": 8
+          },
+          {
+            "row": 10,
+            "col": 9
+          },
+          {
+            "row": 11,
+            "col": 6
+          },
+          {
+            "row": 11,
+            "col": 7
+          },
+          {
+            "row": 11,
+            "col": 8
+          },
+          {
+            "row": 11,
+            "col": 9
+          },
+          {
+            "row": 11,
+            "col": 10
+          },
+          {
+            "row": 11,
+            "col": 2
+          },
+          {
+            "row": 11,
+            "col": 3
+          },
+          {
+            "row": 11,
+            "col": 4
+          },
+          {
+            "row": 10,
+            "col": 3
+          },
+          {
+            "row": 2,
+            "col": 3
+          },
+          {
+            "row": 1,
+            "col": 2
+          },
+          {
+            "row": 1,
+            "col": 3
+          },
+          {
+            "row": 1,
+            "col": 4
+          },
+          {
+            "row": 0,
+            "col": 1
+          },
+          {
+            "row": 0,
+            "col": 2
+          },
+          {
+            "row": 0,
+            "col": 3
+          },
+          {
+            "row": 0,
+            "col": 4
+          },
+          {
+            "row": 0,
+            "col": 5
+          },
+          {
+            "row": 0,
+            "col": 7
+          },
+          {
+            "row": 0,
+            "col": 8
+          },
+          {
+            "row": 0,
+            "col": 9
+          },
+          {
+            "row": 1,
+            "col": 8
+          }
+        ]
+      }
+    ]
+  }
+}

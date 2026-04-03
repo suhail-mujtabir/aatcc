@@ -6,6 +6,7 @@ import WeaveHeader from './WeaveHeader';
 import FabricCanvas from './FabricCanvas';
 import DraftEditor from './DraftEditor';
 import ColorConfigModal from './ColorConfigModal';
+import type { WeaveTemplate } from './templates';
 
 export default function WeavePage() {
   const { isDark } = useTheme();
@@ -28,8 +29,156 @@ export default function WeavePage() {
   } | null>(null);
   const [dialogColor, setDialogColor] = useState('#000000');
   const [dialogTab, setDialogTab] = useState<'uniform' | 'segment'>('uniform');
-  const [segmentThreads, setSegmentThreads] = useState(1);
-  const [segmentStartIndex, setSegmentStartIndex] = useState(0);
+  const [firstThread, setFirstThread] = useState(1);
+  const [lastThread, setLastThread] = useState(1);
+  const [previewColors, setPreviewColors] = useState<{warp: string[], weft: string[]}>({warp: [], weft: []});
+  const [zoom, setZoom] = useState(100); // Zoom level in percentage (25% to 300%)
+
+  // Zoom control functions
+  const handleZoomIn = () => {
+    setZoom(prev => Math.min(prev + 25, 300));
+  };
+
+  const handleZoomOut = () => {
+    setZoom(prev => Math.max(prev - 25, 25));
+  };
+
+  const handleZoomReset = () => {
+    setZoom(100);
+  };
+
+  // Mouse wheel zoom handler (Ctrl + wheel)
+  const handleWheelZoom = (e: WheelEvent) => {
+    if (e.ctrlKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -10 : 10; // 10% increments
+      setZoom(prev => Math.max(25, Math.min(300, prev + delta)));
+    }
+  };
+
+  // Save current canvas as template to templates.ts (dev only)
+  const saveAsTemplate = async () => {
+    const templateName = prompt('Enter template name:');
+    if (!templateName) return;
+
+    const description = prompt('Enter description:');
+    if (!description) return;
+
+    const category = prompt('Category (basic/twills/satins/patterns):') as 'basic' | 'twills' | 'satins' | 'patterns';
+    if (!['basic', 'twills', 'satins', 'patterns'].includes(category)) {
+      alert('Invalid category. Use: basic, twills, satins, or patterns');
+      return;
+    }
+
+    const difficulty = prompt('Difficulty (beginner/intermediate/advanced):') as 'beginner' | 'intermediate' | 'advanced';
+    if (!['beginner', 'intermediate', 'advanced'].includes(difficulty)) {
+      alert('Invalid difficulty. Use: beginner, intermediate, or advanced');
+      return;
+    }
+
+    const applications = prompt('Applications/uses:') || 'Custom weave pattern';
+
+    const template: WeaveTemplate = {
+      id: templateName.toLowerCase().replace(/\s+/g, '-'),
+      name: templateName,
+      category,
+      difficulty,
+      width,
+      height,
+      pattern: grid.map(row => [...row]),
+      description,
+      applications,
+      warpColor: warpColors[0],
+      weftColor: weftColors[0]
+    };
+
+    try {
+      const response = await fetch('/api/weave/save-template', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(template)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(`✅ Template "${templateName}" saved to templates.ts!\n\nRefresh the page to see it in the dropdown.`);
+      } else {
+        alert(`❌ Error: ${result.error}\n\n${result.details || ''}`);
+      }
+    } catch (error) {
+      alert(`❌ Failed to save template: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  // Edit/Update existing template (dev only)
+  const editTemplate = async (templateToEdit: WeaveTemplate) => {
+    // Load the template into canvas first
+    setWidth(templateToEdit.width);
+    setHeight(templateToEdit.height);
+    setGrid(templateToEdit.pattern.map(row => [...row]));
+    setWarpColors(Array(templateToEdit.width).fill(templateToEdit.warpColor || (isDark ? '#6366f1' : '#000000')));
+    setWeftColors(Array(templateToEdit.height).fill(templateToEdit.weftColor || (isDark ? '#020617' : '#ffffff')));
+
+    // Wait a bit for state to update
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Prompt for updated details (pre-fill with existing values)
+    const confirmed = confirm(`Edit "${templateToEdit.name}"?\n\nCurrent canvas will be loaded. Make your changes, then confirm the prompts.`);
+    if (!confirmed) return;
+
+    const templateName = prompt('Template name:', templateToEdit.name);
+    if (!templateName) return;
+
+    const description = prompt('Description:', templateToEdit.description);
+    if (!description) return;
+
+    const category = prompt('Category (basic/twills/satins/patterns):', templateToEdit.category) as 'basic' | 'twills' | 'satins' | 'patterns';
+    if (!['basic', 'twills', 'satins', 'patterns'].includes(category)) {
+      alert('Invalid category. Use: basic, twills, satins, or patterns');
+      return;
+    }
+
+    const difficulty = prompt('Difficulty (beginner/intermediate/advanced):', templateToEdit.difficulty) as 'beginner' | 'intermediate' | 'advanced';
+    if (!['beginner', 'intermediate', 'advanced'].includes(difficulty)) {
+      alert('Invalid difficulty. Use: beginner, intermediate, or advanced');
+      return;
+    }
+
+    const applications = prompt('Applications/uses:', templateToEdit.applications) || 'Custom weave pattern';
+
+    const updatedTemplate: WeaveTemplate = {
+      id: templateToEdit.id, // Keep same ID
+      name: templateName,
+      category,
+      difficulty,
+      width,
+      height,
+      pattern: grid.map(row => [...row]),
+      description,
+      applications,
+      warpColor: warpColors[0],
+      weftColor: weftColors[0]
+    };
+
+    try {
+      const response = await fetch('/api/weave/save-template', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedTemplate)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(`✅ Template "${templateName}" updated in templates.ts!\n\nRefresh the page to see the changes.`);
+      } else {
+        alert(`❌ Error: ${result.error}\n\n${result.details || ''}`);
+      }
+    } catch (error) {
+      alert(`❌ Failed to update template: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
 
   // Update colors when theme changes
   useEffect(() => {
@@ -115,6 +264,22 @@ export default function WeavePage() {
     setWeftColors(Array(8).fill(isDark ? '#020617' : '#ffffff')); // slate-950 for dark mode
   };
 
+  const loadTemplate = (template: WeaveTemplate) => {
+    // Set dimensions
+    setWidth(template.width);
+    setHeight(template.height);
+    
+    // Load pattern
+    setGrid(template.pattern.map(row => [...row]));
+    
+    // Set colors from template or use defaults
+    const warpColor = template.warpColor || (isDark ? '#6366f1' : '#000000');
+    const weftColor = template.weftColor || (isDark ? '#020617' : '#ffffff');
+    
+    setWarpColors(Array(template.width).fill(warpColor));
+    setWeftColors(Array(template.height).fill(weftColor));
+  };
+
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = e.currentTarget;
     const rect = canvas.getBoundingClientRect();
@@ -131,8 +296,9 @@ export default function WeavePage() {
       setColorDialog({ type: 'weft', index });
       setDialogColor(weftColors[index]);
       setDialogTab('uniform');
-      setSegmentThreads(1);
-      setSegmentStartIndex(index);
+      setFirstThread(index + 1);
+      setLastThread(index + 1);
+      setPreviewColors({warp: [...warpColors], weft: [...weftColors]});
       return;
     }
 
@@ -143,8 +309,9 @@ export default function WeavePage() {
       setColorDialog({ type: 'warp', index });
       setDialogColor(warpColors[index]);
       setDialogTab('uniform');
-      setSegmentThreads(1);
-      setSegmentStartIndex(index);
+      setFirstThread(index + 1);
+      setLastThread(index + 1);
+      setPreviewColors({warp: [...warpColors], weft: [...weftColors]});
       return;
     }
   };
@@ -163,23 +330,24 @@ export default function WeavePage() {
   const applySegmentColor = () => {
     if (!colorDialog) return;
 
-    const threads = Math.max(1, Math.min(segmentThreads, colorDialog.type === 'warp' ? width : height));
+    // Convert 1-indexed thread numbers to 0-indexed
+    const maxThreads = colorDialog.type === 'warp' ? width : height;
+    const start = Math.max(1, Math.min(firstThread, maxThreads));
+    const end = Math.max(start, Math.min(lastThread, maxThreads));
 
     if (colorDialog.type === 'warp') {
       setWarpColors(prev => {
         const newColors = [...prev];
-        for (let i = 0; i < threads; i++) {
-          const idx = (segmentStartIndex + i) % width;
-          newColors[idx] = dialogColor;
+        for (let i = start - 1; i < end; i++) {
+          newColors[i] = dialogColor;
         }
         return newColors;
       });
     } else {
       setWeftColors(prev => {
         const newColors = [...prev];
-        for (let i = 0; i < threads; i++) {
-          const idx = (segmentStartIndex + i) % height;
-          newColors[idx] = dialogColor;
+        for (let i = start - 1; i < end; i++) {
+          newColors[i] = dialogColor;
         }
         return newColors;
       });
@@ -224,15 +392,27 @@ export default function WeavePage() {
         onInvert={invertGrid}
         onClear={clearGrid}
         onReset={resetGrid}
+        zoom={zoom}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onZoomReset={handleZoomReset}
+        onLoadTemplate={loadTemplate}
+        onSaveTemplate={saveAsTemplate}
+        onEditTemplate={editTemplate}
+        grid={grid}
+        warpColors={warpColors}
+        weftColors={weftColors}
       />
 
       <FabricCanvas
         grid={grid}
         width={width}
         height={height}
-        warpColors={warpColors}
-        weftColors={weftColors}
+        warpColors={colorDialog ? previewColors.warp : warpColors}
+        weftColors={colorDialog ? previewColors.weft : weftColors}
         onCanvasClick={handleCanvasClick}
+        zoom={zoom}
+        onWheelZoom={handleWheelZoom}
       />
 
       <DraftEditor
@@ -251,15 +431,17 @@ export default function WeavePage() {
           height={height}
           dialogColor={dialogColor}
           dialogTab={dialogTab}
-          segmentThreads={segmentThreads}
-          segmentStartIndex={segmentStartIndex}
+          firstThread={firstThread}
+          lastThread={lastThread}
           onClose={() => setColorDialog(null)}
           onColorChange={setDialogColor}
           onTabChange={setDialogTab}
-          onSegmentThreadsChange={setSegmentThreads}
-          onStartIndexChange={setSegmentStartIndex}
+          onFirstThreadChange={setFirstThread}
+          onLastThreadChange={setLastThread}
           onApplyUniform={applyUniformColor}
           onApplySegment={applySegmentColor}
+          previewColors={previewColors}
+          onPreviewUpdate={setPreviewColors}
         />
       )}
     </div>

@@ -58,7 +58,7 @@ export default function InfiniteScrollTestimonials() {
     <section className="py-12 md:py-16 lg:py-20 bg-gray-50 dark:bg-dark-panel overflow-hidden">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 md:mb-12 lg:mb-16 dark:text-white">
-          Member Testimonials
+          Voices of the Pioneers
         </h2>
         
         <div className="scroll-container relative">

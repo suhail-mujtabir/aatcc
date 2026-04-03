@@ -9,6 +9,7 @@ import RipplesScript from "@/components/scripts/RipplesScript";
 import { handleScrollClick } from "@/components/utils/smoothScroll"; // <-- Imports the new function
 import Intro from '@/components/intro/intro';
 import InfiniteScrollTestimonials from '@/components/home/InfiniteScrollTestimonials';
+import TeacherMessages from '@/components/home/teacherMessages';
 // ================== Page Component ==================
 export default function Home() {
   // The scroll logic is now imported and no longer needs to be defined here.
@@ -34,6 +35,7 @@ export default function Home() {
         <div className="block lg:hidden">
           <NewsCarousel />
         </div>
+        <TeacherMessages />
       <LogoMarquee/>
       </div>
 

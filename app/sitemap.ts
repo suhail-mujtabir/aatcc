@@ -46,6 +46,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     
+    // Testimonials page - High priority (alumni showcase)
+    {
+      url: `${baseUrl}/testimonials`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    
     // Contact page - High priority (engagement)
     {
       url: `${baseUrl}/contact`,
